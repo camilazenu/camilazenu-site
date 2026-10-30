@@ -1,0 +1,42 @@
+{
+  "_howto": "Add an event by copying one block. Dates are YYYY-MM-DD. An event disappears from the site automatically the day after its end date. 'external': true opens the link in a new tab.",
+  "events": [
+    {
+      "title": "Creator Consciousness · Fall Cohort",
+      "start": "2026-10-28",
+      "end": "2026-11-25",
+      "when": "Wednesdays, Oct 28 – Nov 25 · live on Zoom",
+      "description": "The 30-day initiation from consumer to creator is in session. Join the list to hear first when the next cohort opens.",
+      "button": "See the program",
+      "href": "/creator-consciousness"
+    },
+    {
+      "title": "Creator Academy Opens",
+      "start": "2026-11-04",
+      "end": "2026-11-04",
+      "when": "Wednesday, November 4",
+      "description": "Weekly live calls with Camila, weekly creation prompts, the replay library and a community that keeps you posting.",
+      "button": "Explore Creator Academy",
+      "href": "/creator-academy"
+    },
+    {
+      "title": "Founders Call",
+      "start": "2026-11-10",
+      "end": "2026-11-10",
+      "when": "Tuesday, November 10 · 6:00 PM PT · Zoom · free",
+      "description": "A live teaching with Camila and the first look inside Creator Academy. The founding-member offer is shared only on this call.",
+      "button": "Save my spot (free)",
+      "href": "/creator-academy#founders"
+    },
+    {
+      "title": "Creator Immersion Retreat · Tulum",
+      "start": "2027-01-27",
+      "end": "2027-01-31",
+      "when": "January 27 – 31, 2027 · Tulum, Mexico",
+      "description": "Five days to find your voice, shape your offer and create in a professional studio, held by jungle, cenote water and the sea. With Camila and her mentor Jakob Gricar.",
+      "button": "See the retreat",
+      "href": "https://www.vortexretreats.com/creator-consciousness/",
+      "external": true
+    }
+  ]
+}
