@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Camila Zenu · Creator Consciousness</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Warm Devotional family */
+      --linen: #F4E6D2;
+      --linen-soft: #FAF1E2;
+      --wheat: #E4C9A6;
+      --saffron: #C29030;
+      --saffron-light: #D9A95A;
+      --henna: #6B2F1E;
+      --henna-light: #8B4632;
+      --earth: #3A1F12;
+      /* Jungle Canopy family */
+      --sage-mist: #A8B89E;
+      --moss: #6B8268;
+      --jungle: #2D4A35;
+      --canopy: #1B3424;
+      --forest-deep: #1A2A1F;
+      /* Legacy aliases */
+      --beige-light: var(--linen);
+      --beige: #EBD7B8;
+      --beige-deep: var(--wheat);
+      --parchment: var(--linen);
+      --sand: var(--wheat);
+      --gold: var(--saffron);
+      --gold-light: var(--saffron-light);
+      --sage: var(--sage-mist);
+      --sage-deep: var(--moss);
+      --forest: var(--jungle);
+      --umber: var(--henna);
+      --umber-light: var(--henna-light);
+      --ink: var(--earth);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      -webkit-font-smoothing: antialiased;
+      color: var(--ink);
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      background-color: var(--beige-light);
+      background-image:
+        radial-gradient(ellipse at 50% 32%, transparent 45%, rgba(58, 42, 24, 0.18) 100%),
+        linear-gradient(180deg,
+          var(--beige-light) 0%,
+          var(--beige) 25%,
+          #e3dcc6 55%,
+          #c9d3bf 80%,
+          var(--sage) 100%);
+      background-attachment: fixed;
+      position: relative;
+    }
+    /* Grain overlay (lightweight) */
+    body > .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.5;
+      background-image:
+        radial-gradient(rgba(60,42,22,0.18) 0.5px, transparent 1px),
+        radial-gradient(rgba(60,42,22,0.12) 0.5px, transparent 1px);
+      background-size: 3px 3px, 5px 5px;
+      background-position: 0 0, 1px 2px;
+    }
+
+    /* Coiled snake background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: min(150vmin, 1400px);
+      height: min(150vmin, 1400px);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'><g stroke='%231f2a1c' fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke-width='8' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='11' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='15' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='21' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='29' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='39' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='52' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%236b8268' fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke-width='5' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='8' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='12' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='18' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='26' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='36' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='49' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%23a3b89c' fill='none' stroke-linecap='round' opacity='0.65'><path stroke-width='2' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='3' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='4' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='6' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='9' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='13' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='18' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%231f2a1c' fill='none' stroke-linecap='butt' stroke-dasharray='2 5' opacity='0.55'><path stroke-width='6' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='9' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='13' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='19' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='27' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='37' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='50' d='M240 400 a200 200 0 1 1 400 0'/></g></svg>");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+      animation: snakeDrift 90s linear infinite;
+    }
+    @keyframes snakeDrift {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    body > * { position: relative; z-index: 1; }
+    @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
+      letter-spacing: -0.012em;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* Nav */
+    .nav-fixed {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(247, 241, 230, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(143, 166, 136, 0.25);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--forest);
+      letter-spacing: .08em;
+      font-style: italic;
+    }
+    .nav-right { display: flex; align-items: center; gap: 1.75rem; }
+    .nav-link {
+      font-family: 'Inter', sans-serif;
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--forest);
+      padding-bottom: 2px;
+      border-bottom: 1px solid transparent;
+      transition: border-color .25s, color .25s;
+    }
+    .nav-link:hover { border-bottom-color: var(--sage-deep); color: var(--moss); }
+    .nav-cta {
+      font-family: 'Inter', sans-serif;
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--forest);
+      border: 1px solid var(--sage-deep);
+      padding: .55rem 1.25rem;
+      border-radius: 2px;
+      transition: background .25s, color .25s;
+    }
+    .nav-cta:hover { background: var(--sage-deep); color: var(--beige-light); }
+
+    /* Hero */
+    .about-hero {
+      padding: 200px 2rem 60px;
+      text-align: center;
+    }
+    .about-hero .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--sage-deep);
+      margin-bottom: 1.25rem;
+    }
+    .about-hero h1 {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
+      font-style: italic;
+      font-weight: 600;
+      color: var(--forest);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+    .about-hero .subtitle {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--umber);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2.5rem auto;
+    }
+    .ornament-line {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .ornament-line.right { background: linear-gradient(to left, transparent, var(--gold)); }
+    .ornament-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
+
+    /* Photo card */
+    .photo-frame {
+      max-width: 540px;
+      margin: 1.5rem auto 0;
+      position: relative;
+    }
+    .photo-frame img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 22px 60px rgba(61,90,61,0.22);
+    }
+    .photo-frame::after {
+      content: '';
+      position: absolute;
+      inset: -16px -16px 16px 16px;
+      border: 1px solid var(--gold-light);
+      border-radius: 4px;
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    /* Story body */
+    .story {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 2rem 40px;
+    }
+    .story p {
+      font-size: 1.08rem;
+      line-height: 1.95;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+    .story p .lead-cap {
+      float: left;
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-size: 3.4rem;
+      line-height: .9;
+      color: var(--sage-deep);
+      padding: .35rem .55rem 0 0;
+    }
+    .story p strong { color: var(--forest); font-weight: 600; }
+    .story p em { color: var(--umber); }
+
+    /* Pull quote panel */
+    .quote-band {
+      background: linear-gradient(135deg, var(--forest), #2a3d2a 60%, #1f2a1c);
+      margin: 30px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-band-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 64px 2rem;
+      text-align: center;
+    }
+    .quote-band blockquote {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+      color: var(--beige-light);
+      line-height: 1.7;
+    }
+    .quote-band blockquote span { color: var(--gold-light); }
+
+    /* Credentials */
+    .creds-section {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 70px 2rem;
+    }
+    .creds-title {
+      font-family: 'Inter', sans-serif;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--sage-deep);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .creds-heading {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+      color: var(--forest);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .creds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+    .cred-card {
+      background: rgba(255, 251, 240, 0.78);
+      border: 1px solid rgba(184, 152, 90, 0.22);
+      border-top: 2px solid var(--sage-deep);
+      border-radius: 4px;
+      padding: 1.6rem 1.4rem;
+    }
+    .cred-card h3 {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--forest);
+      margin-bottom: .45rem;
+    }
+    .cred-card p {
+      font-size: .92rem;
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    /* Headshot inset */
+    .headshot-inset {
+      max-width: 220px;
+      margin: 0 auto 30px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--gold-light);
+      box-shadow: 0 10px 28px rgba(61,90,61,0.18);
+    }
+    .headshot-inset img { aspect-ratio: 1/1; object-fit: cover; }
+
+    /* CTA band */
+    .cta-band {
+      background: rgba(247, 241, 230, 0.62);
+      backdrop-filter: blur(6px);
+      border-top: 1px solid rgba(143, 166, 136, 0.18);
+      border-bottom: 1px solid rgba(143, 166, 136, 0.18);
+      text-align: center;
+      padding: 90px 2rem;
+    }
+    .cta-band h2 {
+      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+      color: var(--forest);
+      margin-bottom: 1rem;
+    }
+    .cta-band p {
+      max-width: 540px;
+      margin: 0 auto 2rem;
+      color: var(--umber);
+      font-style: italic;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--sage-deep), var(--moss));
+      color: #fdfaf2;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 1rem 2.25rem;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .25s, transform .25s, box-shadow .25s;
+      box-shadow: 0 4px 18px rgba(61,90,61,0.18);
+    }
+    .btn-primary:hover { opacity: .95; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(61,90,61,0.28); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--sage-deep);
+      color: var(--sage-deep);
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: .9rem 2rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .25s, color .25s;
+    }
+    .btn-outline:hover { background: var(--sage-deep); color: var(--beige-light); }
+    .cta-band .actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    footer {
+      background: #1f2a1c;
+      color: #9aaa92;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      font-size: .82rem;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: .06em;
+    }
+    footer a { color: var(--gold-light); }
+    footer a:hover { text-decoration: underline; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s, transform .7s;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+
+    @media (max-width: 600px) {
+      .nav-right { gap: .9rem; }
+      .nav-link { font-size: .68rem; letter-spacing: .12em; }
+      .photo-frame::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <a class='nav-logo' href='/'>Creator Consciousness</a>
+      <div class="nav-right">
+        <a class='nav-link' href='/'>Home</a>
+        <a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener" class="nav-cta">Book a Call with Camila</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="about-hero">
+    <p class="eyebrow reveal">About</p>
+    <h1 class="reveal reveal-delay-1">Camila Zenu</h1>
+    <p class="subtitle reveal reveal-delay-2">Somatic Practitioner, embodiment coach, and creator consciousness mentor.</p>
+    <div class="ornament reveal reveal-delay-3">
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line right"></div>
+    </div>
+    <div class="photo-frame reveal">
+      <img src="img/full-shot.jpg" alt="Camila Zenu portrait" />
+    </div>
+  </section>
+
+  <section class="story">
+    <p class="reveal"><span class="lead-cap">C</span>amila is a Somatic Practitioner, embodiment coach, and creator consciousness mentor. She works with people who feel called to share their voice but can't seem to get out of their own way, because she spent years there herself.</p>
+
+    <p class="reveal reveal-delay-1">She was born in Colombia and came to the United States at six years old, on asylum, after guerrilla groups targeted her family. She grew up in Palmdale, California as a DACA recipient carrying a story she didn't yet know how to tell, in a country that didn't always make space for her to tell it.</p>
+
+    <p class="reveal reveal-delay-2">She found her way into fashion in LA, launched the sustainable streetwear label <strong>DeadBlud</strong>, and made it onto HBO Max's <em>The Hype</em>, reaching the final four. From the outside, it looked like things were working. But she was also inside a marriage and a version of herself that wasn't.</p>
+  </section>
+
+  <section class="quote-band">
+    <div class="quote-band-inner reveal">
+      <blockquote>
+        &ldquo;When both ended in the same period, she didn't rebuild.<br>
+        <span>She went inward.&rdquo;</span>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="story">
+    <p class="reveal">She got certified in breathwork, studied NLP, trained in Somatic therapy and ontology under Jeremiah Dupin, Jakob Gricar, and Judith Johnson. She developed a real relationship with God, one she could actually lean on. She learned to regulate her nervous system instead of just survive it.</p>
+
+    <p class="reveal reveal-delay-1">She went back to Colombia, the country she had fled as a child, and let her roots become the foundation of something new: <strong>Ze-Nu Worldwide</strong>, a slow-fashion brand born from that return.</p>
+
+    <p class="reveal reveal-delay-2">Eventually, terrified, she started sharing it all online. Not with a strategy. With her actual story. And people responded, not because it was perfect, but because it was true.</p>
+
+    <p class="reveal reveal-delay-3">Now she works with 1:1 clients from all over the world, leads in group containers, and is finally launching her own. <strong>Creator Consciousness</strong> is a 30-day container for women who are ready to stop performing and start being seen. She also leads retreats around the world for women who are ready to feel free in their body, their voice, and their story.</p>
+  </section>
+
+  <section class="creds-section">
+    <div class="headshot-inset reveal">
+      <img src="img/headshot.jpg" alt="Camila Zenu headshot" />
+    </div>
+    <p class="creds-title reveal">Training &amp; Lineage</p>
+    <h2 class="creds-heading reveal reveal-delay-1">The work behind the work</h2>
+    <div class="creds-grid">
+      <div class="cred-card reveal reveal-delay-1">
+        <h3>Breathwork Facilitation</h3>
+        <p>Certified breathwork facilitator guiding nervous-system-led practice.</p>
+      </div>
+      <div class="cred-card reveal reveal-delay-2">
+        <h3>NLP &amp; Ontology</h3>
+        <p>Trained under Jeremiah Dupin, Jakob Gricar, and Judith Johnson.</p>
+      </div>
+      <div class="cred-card reveal reveal-delay-3">
+        <h3>Somatic Therapy</h3>
+        <p>Body-based modalities for regulation, integration, and embodied expression.</p>
+      </div>
+      <div class="cred-card reveal reveal-delay-1">
+        <h3>Founder, Ze-Nu Worldwide</h3>
+        <p>Slow-fashion brand born from a return to her Colombian roots.</p>
+      </div>
+      <div class="cred-card reveal reveal-delay-2">
+        <h3>Founder, DeadBlud</h3>
+        <p>Sustainable streetwear label featured on HBO Max's <em>The Hype</em>.</p>
+      </div>
+      <div class="cred-card reveal reveal-delay-3">
+        <h3>Group &amp; Retreat Leader</h3>
+        <p>Hosts international retreats for women ready to feel free in their body and voice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <h2 class="reveal">Ready to be seen?</h2>
+    <p class="reveal reveal-delay-1">Creator Consciousness opens October 28th. A 30-day container for women ready to stop performing and start being.</p>
+    <div class="actions reveal reveal-delay-2">
+      <a class='btn-primary' href='/#pricing'>Claim Your Spot</a>
+      <a class='btn-outline' href='/'>Back to Home</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>Creator Consciousness &middot; Camila Zenu</p>
+    <p style="margin-top:.4rem;">&copy; 2026 Creator Consciousness. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
