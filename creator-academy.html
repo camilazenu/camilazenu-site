@@ -96,17 +96,11 @@
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
   <script>
-    // Checkout buttons are switched on once Stripe is connected.
-    document.querySelectorAll('[data-checkout],[data-action]').forEach(a => a.addEventListener('click', e => {
-      if (a.getAttribute('href') === '#') {
-        e.preventDefault();
-        if (!a.nextElementSibling || !a.nextElementSibling.classList.contains('fine')) {
-          const n = document.createElement('p'); n.className = 'fine'; n.style.marginTop = '.5rem';
-          n.textContent = 'Doors open Wednesday, November 4. Check back then!';
-          a.after(n);
-        }
-      }
-    }));
+    // Plans route through the member area: log in or create an account first, then straight to Stripe Checkout.
+    document.querySelectorAll('[data-checkout]').forEach((a) => {
+      a.href = '/academy/?next=' + encodeURIComponent('checkout-' + a.dataset.checkout.replace('academy-', ''));
+    });
+    document.querySelectorAll('[data-action="free-account"]').forEach((a) => { a.href = '/academy/login?mode=signup&next=founders'; });
   </script>
 </body>
 </html>

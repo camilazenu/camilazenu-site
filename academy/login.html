@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Log in · Creator Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+  <link rel="stylesheet" href="/assets/academy.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/creator-academy">Creator Academy</a>
+      </div>
+    </div>
+  </nav>
+  <main class="ac-wrap">
+    <div class="auth-card">
+      <div class="ac-head" style="justify-content:center;text-align:center"><h1>Creator <em>Academy</em></h1></div>
+      <div id="msg" class="notice" hidden></div>
+
+      <div class="auth-switch" id="switch">
+        <button type="button" data-mode="login" class="on">Log in</button>
+        <button type="button" data-mode="signup">Create account</button>
+      </div>
+
+      <form id="login" class="card ac-form" data-panel="login">
+        <label>Email <input type="email" name="email" autocomplete="email" required /></label>
+        <label>Password <input type="password" name="password" autocomplete="current-password" required /></label>
+        <button class="btn-primary" type="submit">Log in</button>
+        <button class="linkish" type="button" data-mode="forgot" style="justify-self:start">Forgot your password?</button>
+      </form>
+
+      <form id="signup" class="card ac-form" data-panel="signup" hidden>
+        <label>Your name <input type="text" name="name" autocomplete="name" required /></label>
+        <label>Email <input type="email" name="email" autocomplete="email" required /></label>
+        <label>Password <small>At least 8 characters</small><input type="password" name="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="btn-primary" type="submit">Create my account</button>
+        <p class="fine">A free account lets you RSVP to the Founders Call. Membership starts when you choose a plan.</p>
+      </form>
+
+      <form id="forgot" class="card ac-form" data-panel="forgot" hidden>
+        <p>Enter your email and we'll send you a link to set a new password.</p>
+        <label>Email <input type="email" name="email" autocomplete="email" required /></label>
+        <button class="btn-primary" type="submit">Send reset link</button>
+        <button class="linkish" type="button" data-mode="login" style="justify-self:start">Back to log in</button>
+      </form>
+
+      <form id="setpw" class="card ac-form" data-panel="setpw" hidden>
+        <p id="setpw-intro">Choose a new password.</p>
+        <label>New password <input type="password" name="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="btn-primary" type="submit">Save password</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script type="module">
+    import { login, signup, getUser, handleAuthCallback, requestPasswordRecovery, updateUser, acceptInvite, notice, busy } from '/assets/academy-client.js';
+
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next') || '';
+    const msg = document.getElementById('msg');
+    const goIn = () => { location.href = '/academy/' + (next ? `?next=${encodeURIComponent(next)}` : ''); };
+
+    function show(mode) {
+      document.querySelectorAll('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== mode));
+      document.querySelectorAll('#switch button').forEach((b) => b.classList.toggle('on', b.dataset.mode === mode));
+      document.getElementById('switch').hidden = mode === 'setpw' || mode === 'forgot';
+    }
+    document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { notice(msg, ''); show(b.dataset.mode); }));
+
+    const friendly = (e) => {
+      const m = String(e?.message || e);
+      if (/invalid.*(grant|credentials|password)|no user found/i.test(m)) return 'That email and password don’t match. Try again or reset your password.';
+      if (/already registered|already exists/i.test(m)) return 'There’s already an account with that email. Log in instead.';
+      if (/not confirmed/i.test(m)) return 'Please confirm your email first. Check your inbox for the link.';
+      return m || 'Something went wrong. Please try again.';
+    };
+
+    let inviteToken = null;
+    try {
+      const cb = await handleAuthCallback();
+      if (cb?.type === 'recovery') { show('setpw'); }
+      else if (cb?.type === 'invite') { inviteToken = cb.token; document.getElementById('setpw-intro').textContent = 'Welcome! Choose a password to finish setting up your account.'; show('setpw'); }
+      else if (cb?.user) { goIn(); }
+      else if (await getUser()) { goIn(); }
+      else if (params.get('mode') === 'signup') { show('signup'); }
+      if (next === 'founders' && !cb) notice(msg, 'Create a free account (or log in) to save your spot on the Founders Call.', 'info');
+      else if (next.startsWith('checkout') && !cb) notice(msg, 'Log in or create an account, then you’ll go straight to checkout.', 'info');
+    } catch (e) { notice(msg, friendly(e), 'error'); }
+
+    document.getElementById('login').addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const f = new FormData(ev.target);
+      busy(ev.submitter, async () => {
+        try { await login(f.get('email'), f.get('password')); goIn(); }
+        catch (e) { notice(msg, friendly(e), 'error'); }
+      });
+    });
+
+    document.getElementById('signup').addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const f = new FormData(ev.target);
+      busy(ev.submitter, async () => {
+        try {
+          const user = await signup(f.get('email'), f.get('password'), { full_name: f.get('name') });
+          if (user?.confirmedAt) {
+            await login(f.get('email'), f.get('password')).catch(() => {});
+            goIn();
+          } else {
+            notice(msg, 'Almost there! We sent a confirmation link to your email. Click it to finish creating your account.', 'ok');
+            ev.target.reset();
+          }
+        } catch (e) { notice(msg, friendly(e), 'error'); }
+      });
+    });
+
+    document.getElementById('forgot').addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const f = new FormData(ev.target);
+      busy(ev.submitter, async () => {
+        try { await requestPasswordRecovery(f.get('email')); notice(msg, 'If that email has an account, a reset link is on its way.', 'ok'); }
+        catch (e) { notice(msg, friendly(e), 'error'); }
+      });
+    });
+
+    document.getElementById('setpw').addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const f = new FormData(ev.target);
+      busy(ev.submitter, async () => {
+        try {
+          if (inviteToken) await acceptInvite(inviteToken, f.get('password'));
+          else await updateUser({ password: f.get('password') });
+          goIn();
+        } catch (e) { notice(msg, friendly(e), 'error'); }
+      });
+    });
+
+  </script>
+</body>
+</html>

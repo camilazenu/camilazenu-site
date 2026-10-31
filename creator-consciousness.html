@@ -1391,7 +1391,7 @@
           <div class="price-label">Paid in Full</div>
           <div class="price-amount">$888</div>
           <div class="price-note">One-time payment for Creator Consciousness 2.0</div>
-          <a href="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-d0533e0e7a914a83b3c3b1a177a906879bf30103893648fca4ccf6e91c7f475a3164cfa4a27e4f63b2f7c35a5f196000-1?locale=EN_US&amp;cta=saveandcopylink" target="_blank" rel="noopener" class="btn-primary">Save My Seat &middot; $888</a>
+          <a href="#pricing" data-cc="full" class="btn-primary">Save My Seat &middot; $888</a>
           <div class="price-fine">Program begins October 28, 2026</div>
         </div>
         <!-- Option 2: Payment Plan (2 x $500 = $1000) -->
@@ -1399,13 +1399,14 @@
           <div class="price-label">Payment Plan</div>
           <div class="price-amount">$500 <span class="price-amount-sub">today</span></div>
           <div class="price-strike">2 payments of $500 &middot; Total $1,000</div>
-          <div class="price-note">$500 due today. Remaining $500 due on or before October 28, 2026.</div>
-          <a href="https://connect.intuit.com/portal/app/CommerceNetwork/view/scs-v1-f38f1a2cd88a4a0ea7237d64e3f431044d220d9214284ee2bd760a02f724ad098bc388b3997f4563be65932850f5a78d-1?locale=EN_US&amp;cta=saveandcopylink" target="_blank" rel="noopener" class="btn-primary">Save My Seat &middot; $500 today</a>
+          <div class="price-note">$500 today. The second $500 is charged automatically one month later, then the plan ends.</div>
+          <a href="#pricing" data-cc="installment" class="btn-primary">Save My Seat &middot; $500 today</a>
           <div class="price-fine">Program begins October 28, 2026</div>
         </div>
       </div>
 
-      <p class="secure-note reveal">Secure checkout via Intuit &middot; All major cards accepted &middot; Questions? <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+      <p id="cc-msg" class="secure-note" hidden></p>
+      <p class="secure-note reveal">Secure checkout via Stripe &middot; All major cards accepted &middot; Questions? <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
     </div>
   </section>
 
@@ -1441,5 +1442,30 @@
   </script>
 
   <script src="/assets/menu.js"></script>
+  <script>
+    // Enrollment buttons open Stripe Checkout (created server-side so prices can't be altered).
+    (function () {
+      const msg = document.getElementById('cc-msg');
+      const say = (t) => { msg.textContent = t; msg.hidden = !t; };
+      if (new URLSearchParams(location.search).get('enrolled')) {
+        say('You\u2019re in \u2726 Check your email for your receipt. Camila will be in touch with everything you need.');
+        document.getElementById('pricing').scrollIntoView();
+      }
+      document.querySelectorAll('[data-cc]').forEach((a) => a.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const label = a.innerHTML;
+        a.textContent = 'One moment\u2026';
+        try {
+          const res = await fetch('/api/cc/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ plan: a.dataset.cc }) });
+          const data = await res.json();
+          if (!res.ok || !data.url) throw new Error(data.error || 'Checkout is unavailable right now.');
+          location.href = data.url;
+        } catch (err) {
+          a.innerHTML = label;
+          say(err.message + ' Questions? Email camila@camilazenu.com.');
+        }
+      }));
+    })();
+  </script>
 </body>
 </html>

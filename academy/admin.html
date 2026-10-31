@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Admin · Creator Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+  <link rel="stylesheet" href="/assets/academy.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/creator-academy">Creator Academy</a>
+      </div>
+    </div>
+  </nav>
+  <main class="ac-wrap">
+    <div class="ac-head">
+      <h1>Camila’s <em>tools</em></h1>
+      <div class="who"><a href="/academy/">Back to the Academy</a></div>
+    </div>
+    <div id="msg" class="notice" hidden></div>
+    <div id="app"><p class="loading">Loading…</p></div>
+  </main>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script type="module">
+    import { api, esc, fmtDate, notice, busy } from '/assets/academy-client.js';
+    import { Upload } from '/assets/vendor/tus.js';
+
+    const app = document.getElementById('app');
+    const msg = document.getElementById('msg');
+    const ok = (t) => { notice(msg, t, 'ok'); scrollTo({ top: 0, behavior: 'smooth' }); };
+    const fail = (e) => { notice(msg, e.message || String(e), 'error'); scrollTo({ top: 0, behavior: 'smooth' }); };
+    const today = () => new Date().toLocaleDateString('en-CA');
+    const statusPill = (r) => `<span class="pill ${r.member ? 'on' : r.status === 'past_due' ? 'off' : ''}">${esc(r.member && r.status === 'none' ? 'comp' : r.status)}</span>`;
+
+    async function render() {
+      let d;
+      try { d = await api('/api/academy/admin', { action: 'load' }); }
+      catch (e) { app.innerHTML = ''; return fail(e.status === 403 ? new Error('This page is for Academy admins.') : e); }
+      const s = d.settings;
+      const active = d.roster.filter((r) => r.member).length;
+
+      app.innerHTML = `
+      <div class="ac-section">
+        <h2>Weekly call</h2>
+        <form class="card ac-form" id="settings">
+          <div class="row">
+            <label>Call name <input name="callTitle" value="${esc(s.callTitle || 'Weekly Live Call')}" /></label>
+            <label>When it happens <small>Shown to members, e.g. “Tuesdays · 6:00 PM PT”</small><input name="callTime" value="${esc(s.callTime || '')}" /></label>
+          </div>
+          <div class="row">
+            <label>Next call <input type="datetime-local" name="nextCall" value="${esc((s.nextCall || '').slice(0, 16))}" /></label>
+            <label>Zoom link for members <input type="url" name="zoomUrl" placeholder="https://zoom.us/j/…" value="${esc(s.zoomUrl || '')}" /></label>
+          </div>
+          <label>Founders Call Zoom link <small>Shown to everyone who RSVPs (free accounts included)</small><input type="url" name="foundersZoomUrl" placeholder="https://zoom.us/j/…" value="${esc(s.foundersZoomUrl || '')}" /></label>
+          <label>Welcome note <small>Optional message at the top of the members page</small><textarea name="welcome">${esc(s.welcome || '')}</textarea></label>
+          <button class="btn-primary" type="submit">Save call details</button>
+        </form>
+
+        <h2>Post a prompt or update</h2>
+        <form class="card ac-form" id="post">
+          <label>Type <select name="kind"><option value="prompt">Weekly prompt</option><option value="post">Update from Camila</option></select></label>
+          <label>Title <input name="title" required /></label>
+          <label>Message <textarea name="body"></textarea></label>
+          <button class="btn-primary" type="submit">Publish to members</button>
+        </form>
+        ${d.posts.length ? `<div class="card"><div class="kicker">Published</div><table class="ac-table"><tbody>
+          ${[...d.posts].sort((a, b) => b.createdAt - a.createdAt).map((p) => `<tr><td>${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td><td>${esc(p.title)}<br><span class="fine">${p.kind} · ${p.comments.length} replies</span></td><td><button class="linkish" data-delpost="${esc(p.id)}">Delete</button></td></tr>`).join('')}
+        </tbody></table></div>` : ''}
+
+        <h2>Replays</h2>
+        <form class="card ac-form" id="upload">
+          <p>Upload the call recording here. It goes straight to your private Cloudflare video library; only logged-in members can watch it.</p>
+          <label>Video file <input type="file" name="file" accept="video/*" required /></label>
+          <div class="row">
+            <label>Title <input name="title" required placeholder="Weekly Call: Finding your voice" /></label>
+            <label>Call date <input type="date" name="date" required value="${today()}" /></label>
+          </div>
+          <label>Notes <small>Optional</small><textarea name="note" style="min-height:70px"></textarea></label>
+          <progress id="prog" value="0" max="100" hidden></progress>
+          <button class="btn-primary" type="submit">Upload &amp; publish</button>
+          <p class="fine">Keep this tab open until it says Published. The video takes a few minutes to finish processing before it plays.</p>
+        </form>
+        ${d.replays.length ? `<div class="card"><div class="kicker">In the library</div><table class="ac-table"><tbody>
+          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}</td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
+        </tbody></table></div>` : ''}
+
+        <h2>Included access</h2>
+        <form class="card ac-form" id="comp">
+          <p>Give someone free access until a date, like your current Creator Consciousness cohort. They just create an account with this email.</p>
+          <div class="row">
+            <label>Email <input type="email" name="email" required /></label>
+            <label>Access until <input type="date" name="until" required value="2026-12-25" /></label>
+          </div>
+          <label>Note <small>Optional, only you see it</small><input name="note" placeholder="Fall cohort" /></label>
+          <button class="btn-primary" type="submit">Give access</button>
+        </form>
+        ${d.comps.length ? `<div class="card"><table class="ac-table"><thead><tr><th>Email</th><th>Until</th><th>Note</th><th></th></tr></thead><tbody>
+          ${d.comps.map((c) => `<tr><td>${esc(c.email)}</td><td>${esc(fmtDate(c.until, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(c.note || '')}</td><td><button class="linkish" data-delcomp="${esc(c.email)}">Remove</button></td></tr>`).join('')}
+        </tbody></table></div>` : ''}
+
+        <h2>Members <span class="fine">${active} with access · ${d.roster.length} accounts</span></h2>
+        <div class="card" style="overflow-x:auto">${d.roster.length ? `<table class="ac-table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Plan</th><th>Renews / ends</th><th>Founders RSVP</th></tr></thead><tbody>
+          ${d.roster.sort((a, b) => Number(b.member) - Number(a.member)).map((r) => `<tr><td>${esc(r.name || '')}</td><td>${esc(r.email)}</td><td>${statusPill(r)}${r.cancelAtPeriodEnd ? ' <span class="fine">canceling</span>' : ''}</td><td>${esc(r.plan || '')}</td><td>${r.periodEnd ? esc(fmtDate(r.periodEnd, { month: 'short', day: 'numeric' })) : ''}</td><td>${r.foundersRsvp ? '✦' : ''}</td></tr>`).join('')}
+        </tbody></table>` : '<p class="muted">No accounts yet.</p>'}</div>
+      </div>`;
+
+      const form = (id, fn) => (document.getElementById(id).onsubmit = (ev) => { ev.preventDefault(); busy(ev.submitter, () => fn(new FormData(ev.target), ev.target)); });
+
+      form('settings', async (f) => {
+        try {
+          const nextCall = f.get('nextCall') ? new Date(f.get('nextCall')).toISOString() : '';
+          await api('/api/academy/admin', { action: 'saveSettings', ...Object.fromEntries(f), nextCall });
+          ok('Call details saved.');
+        } catch (e) { fail(e); }
+      });
+      form('post', async (f) => {
+        try { await api('/api/academy/admin', { action: 'addPost', ...Object.fromEntries(f) }); ok('Published to members.'); await render(); } catch (e) { fail(e); }
+      });
+      form('comp', async (f) => {
+        try { await api('/api/academy/admin', { action: 'grantComp', ...Object.fromEntries(f) }); ok(`Access given to ${f.get('email')}.`); await render(); } catch (e) { fail(e); }
+      });
+      form('upload', async (f) => {
+        const file = f.get('file');
+        const prog = document.getElementById('prog');
+        try {
+          const { uploadUrl, uid } = await api('/api/academy/admin', { action: 'uploadUrl', size: file.size, name: f.get('title') });
+          prog.hidden = false;
+          await new Promise((resolve, reject) => {
+            const up = new Upload(file, {
+              uploadUrl,
+              chunkSize: 50 * 1024 * 1024,
+              retryDelays: [0, 3000, 5000, 10000, 20000],
+              onProgress: (sent, total) => { prog.value = Math.round((sent / total) * 100); },
+              onError: reject,
+              onSuccess: resolve,
+            });
+            up.start();
+          });
+          await api('/api/academy/admin', { action: 'addReplay', uid, title: f.get('title'), date: f.get('date'), note: f.get('note') });
+          ok('Published ✦ The replay will be watchable once Cloudflare finishes processing (usually a few minutes).');
+          await render();
+        } catch (e) { prog.hidden = true; fail(e); }
+      });
+      app.querySelectorAll('[data-delpost]').forEach((b) => (b.onclick = () => confirm('Delete this post and its replies?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'deletePost', id: b.dataset.delpost }); await render(); } catch (e) { fail(e); } })));
+      app.querySelectorAll('[data-delreplay]').forEach((b) => (b.onclick = () => confirm('Remove this replay from the library? (The video stays in Cloudflare.)') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeReplay', uid: b.dataset.delreplay }); await render(); } catch (e) { fail(e); } })));
+      app.querySelectorAll('[data-delcomp]').forEach((b) => (b.onclick = () => confirm('Remove included access for this email?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeComp', email: b.dataset.delcomp }); await render(); } catch (e) { fail(e); } })));
+    }
+    await render();
+
+  </script>
+</body>
+</html>

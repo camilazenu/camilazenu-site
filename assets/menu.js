@@ -1,6 +1,12 @@
 // Site menu: one place to edit the navigation for every page.
 // Edit MENU below to add, remove or rename items.
 (function () {
+  // Account emails (confirm, reset password, invite) land on the homepage with a token in the URL hash.
+  // Hand them to the Academy login page, which finishes the flow.
+  if (/(confirmation|recovery|invite|email_change)_token=/.test(location.hash) && location.pathname !== '/academy/login') {
+    location.replace('/academy/login' + location.hash);
+    return;
+  }
   const MENU = [
     { label: 'Home', href: '/' },
     { label: 'Events', href: '/events' },
