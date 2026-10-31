@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events · Camila Zenu</title>
+  <meta name="description" content="Upcoming calls, cohorts and retreats with Camila Zenu." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/about">About</a>
+        <a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener" class="nav-cta">Book a Call</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-hero">
+    <div class="section-label">What's Coming</div>
+    <h1>Upcoming <em>Events</em></h1>
+    <p class="lede">Live calls, cohorts and retreats. Come as you are.</p>
+  </header>
+  <div class="wrap-narrow">
+    <div id="events"><p class="empty-note">Loading events&hellip;</p></div>
+  </div>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+  <script>
+  (async function () {
+    const box = document.getElementById('events');
+    try {
+      const data = await (await fetch('/assets/events.json', { cache: 'no-store' })).json();
+      const today = new Date(); today.setHours(0,0,0,0);
+      const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+      const list = data.events.filter(e => parse(e.end || e.start) >= today)
+                              .sort((a, b) => parse(a.start) - parse(b.start));
+      if (!list.length) { box.innerHTML = '<p class="empty-note">New dates are coming soon.</p>'; return; }
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      box.innerHTML = list.map(e => {
+        const d = parse(e.start);
+        const mon = d.toLocaleString('en-US', { month: 'short' });
+        const ext = e.external ? ' target="_blank" rel="noopener"' : '';
+        return `<div class="card event reveal visible">
+          <div class="event-date"><div class="m">${mon}</div><div class="d">${d.getDate()}</div><div class="y">${d.getFullYear()}</div></div>
+          <div>
+            <h3>${esc(e.title)}</h3>
+            <div class="meta">${esc(e.when)}</div>
+            <p style="margin:.6rem 0 1rem">${esc(e.description)}</p>
+            <a class="btn-primary" href="${esc(e.href)}"${ext}>${esc(e.button)}${e.external ? ' ↗' : ''}</a>
+          </div></div>`;
+      }).join('');
+    } catch (err) { box.innerHTML = '<p class="empty-note">Events could not load. Please refresh.</p>'; }
+  })();
+  </script>
+</body>
+</html>

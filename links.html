@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Links · Camila Zenu</title>
+  <meta name="description" content="All of Camila Zenu’s links in one place." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/about">About</a>
+        <a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener" class="nav-cta">Book a Call</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-hero" style="padding-bottom:20px">
+    <img class="avatar" src="/img/headshot.jpg" alt="Camila Zenu" />
+    <h1 style="font-size:2.6rem">Camila <em>Zenu</em></h1>
+    <p class="lede">Creator · somatic practitioner · mentor</p>
+  </header>
+  <div class="wrap-narrow" style="padding-top:10px">
+    <ul class="link-list">
+      <li><a class="primary" href="/creator-academy">Creator Academy<small>Weekly calls, prompts &amp; community · opens Nov 4</small></a></li>
+      <li><a href="/events">Upcoming events<small>Founders Call, cohorts &amp; retreats</small></a></li>
+      <li><a href="/creator-consciousness">Creator Consciousness<small>The 30-day initiation</small></a></li>
+      <li><a href="https://www.vortexretreats.com/creator-consciousness/" target="_blank" rel="noopener">Tulum Retreat · Jan 27–31, 2027 ↗<small>Creator Immersion Retreat</small></a></li>
+      <li><a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener">Book a call with Camila ↗</a></li>
+      <li><a href="https://www.instagram.com/camilazenu" target="_blank" rel="noopener">Instagram ↗</a></li>
+      <li><a href="https://www.tiktok.com/@camilazenu" target="_blank" rel="noopener">TikTok ↗</a></li>
+      <li><a href="mailto:camila@camilazenu.com">Email Camila</a></li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

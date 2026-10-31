@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator Academy · Camila Zenu</title>
+  <meta name="description" content="A weekly live call with Camila, weekly creation prompts, the replay library and community. $88/month." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/about">About</a>
+        <a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener" class="nav-cta">Book a Call</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding-bottom:70px">
+    <div class="hero-ring" style="width:520px;height:520px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+    <h1 class="hero-heading">Creator<br><span class="hero-em">Academy</span></h1>
+    <p class="hero-sub">Keep creating. Keep showing up. Together, every week.</p>
+    <div class="hero-badges">
+      <span>&#10022; Doors open Wednesday, November 4</span>
+      <span>&#10022; Weekly live calls with Camila</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#join" class="btn-primary">Start 7-Day Free Trial</a>
+      <a href="#founders" class="btn-outline">Founders Call · Nov 10</a>
+    </div>
+  </section>
+
+  <div class="wrap-narrow">
+    <div class="section-label reveal">What You Get</div>
+    <ul class="ticks reveal">
+      <li><strong>A live call with Camila every week</strong>, recorded for anyone who can't make it</li>
+      <li><strong>A weekly creation prompt</strong> that the whole community works through together, Camila included, for real accountability</li>
+      <li><strong>The replay library:</strong> past calls Camila has opened to members</li>
+      <li><strong>The community feed:</strong> share what you made, get seen, celebrate wins</li>
+      <li><strong>A classroom</strong> of lessons on voice, story, camera and the nervous system (opening mid-November)</li>
+      <li><strong>First access and $100 off</strong> every future Creator Consciousness cohort</li>
+    </ul>
+
+    <h2 class="section-title reveal" id="join">Join Creator Academy</h2>
+    <div class="price-row">
+      <div class="card feature reveal">
+        <span class="badge">Most flexible</span>
+        <div class="kicker">Monthly</div>
+        <div class="price-big">$88 <span>/ month</span></div>
+        <p>Start with 7 days free. Cancel anytime from your account.</p>
+        <div class="actions"><a class="btn-primary" href="#" data-checkout="academy-monthly">Start 7-day free trial</a></div>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="kicker">Yearly</div>
+        <div class="price-big">$880 <span>/ year</span></div>
+        <p>Two months free. One payment, a full year of weekly calls.</p>
+        <div class="actions"><a class="btn-outline" href="#" data-checkout="academy-yearly">Join yearly</a></div>
+      </div>
+    </div>
+    <p class="fine reveal">Free trial converts to $88/month unless you cancel before day 7. You'll get a reminder email before your trial ends. Cancel anytime in your account. Have a code? You can enter it at checkout.</p>
+
+    <h2 class="section-title reveal" id="founders">The Founders Call</h2>
+    <div class="card reveal">
+      <div class="kicker">Free · Live on Zoom</div>
+      <h3>Tuesday, November 10 · 6:00 PM PT</h3>
+      <p>A real teaching you can use that night, a walkthrough of Creator Academy and the founding-member offer, shared only on this call. 30 founding seats.</p>
+      <div class="actions"><a class="btn-primary" href="#" data-action="free-account">Save my spot (free)</a></div>
+    </div>
+
+    <h2 class="section-title reveal">Questions</h2>
+    <div class="reveal">
+      <p><strong>Can I cancel anytime?</strong> Yes. Join or leave whenever you like, straight from your account.</p>
+      <p style="margin-top:.8rem"><strong>I'm in Creator Consciousness. Do I get access?</strong> Yes. Creator Academy is included while your cohort runs and for a month after.</p>
+      <p style="margin-top:.8rem"><strong>What if I miss a live call?</strong> Every weekly call is recorded and posted to the library.</p>
+      <p style="margin-top:.8rem"><strong>Already a member?</strong> <a href="/academy/login">Log in here</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+  <script>
+    // Plans route through the member area: log in or create an account first, then straight to Stripe Checkout.
+    document.querySelectorAll('[data-checkout]').forEach((a) => {
+      a.href = '/academy/?next=' + encodeURIComponent('checkout-' + a.dataset.checkout.replace('academy-', ''));
+    });
+    document.querySelectorAll('[data-action="free-account"]').forEach((a) => { a.href = '/academy/login?mode=signup&next=founders'; });
+  </script>
+</body>
+</html>

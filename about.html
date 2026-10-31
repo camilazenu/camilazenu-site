@@ -424,6 +424,7 @@
       .photo-frame::after { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/menu.css" />
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -448,7 +449,7 @@
       <div class="ornament-line right"></div>
     </div>
     <div class="photo-frame reveal">
-      <img src="img/full-shot.jpg" alt="Camila Zenu portrait" />
+      <img src="/img/full-shot.jpg" alt="Camila Zenu portrait" />
     </div>
   </section>
 
@@ -481,7 +482,7 @@
 
   <section class="creds-section">
     <div class="headshot-inset reveal">
-      <img src="img/headshot.jpg" alt="Camila Zenu headshot" />
+      <img src="/img/headshot.jpg" alt="Camila Zenu headshot" />
     </div>
     <p class="creds-title reveal">Training &amp; Lineage</p>
     <h2 class="creds-heading reveal reveal-delay-1">The work behind the work</h2>
@@ -533,5 +534,6 @@
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
+  <script src="/assets/menu.js"></script>
 </body>
 </html>

@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Members area pages are static shells; every piece of member content
+# is fetched from functions that check login + membership server-side.
+[[headers]]
+  for = "/academy/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"

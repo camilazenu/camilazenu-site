@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Members · Creator Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/base.css" />
+  <link rel="stylesheet" href="/assets/menu.css" />
+  <link rel="stylesheet" href="/assets/pages.css" />
+  <link rel="stylesheet" href="/assets/academy.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <nav class="nav-fixed">
+    <div class="nav-inner">
+      <span class="nav-logo">Camila Zenu</span>
+      <div class="nav-right">
+        <a class="nav-link" href="/creator-academy">Creator Academy</a>
+      </div>
+    </div>
+  </nav>
+  <main class="ac-wrap">
+    <div class="ac-head">
+      <h1>Creator <em>Academy</em></h1>
+      <div class="who" id="who"></div>
+    </div>
+    <div id="msg" class="notice" hidden></div>
+    <div id="app"><p class="loading">Opening the doors…</p></div>
+  </main>
+
+  <footer>
+    <p>Camila Zenu &middot; <a href="/links">Links</a> &middot; <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+    <p style="margin-top:.4rem;">&copy; 2026 Camila Zenu. All rights reserved.</p>
+  </footer>
+  <script src="/assets/menu.js"></script>
+  <script type="module">
+    import { api, esc, rich, fmtDate, fmtDateTime, notice, busy, logout, startCheckout } from '/assets/academy-client.js';
+
+    const app = document.getElementById('app');
+    const msg = document.getElementById('msg');
+    const params = new URLSearchParams(location.search);
+    const fail = (e) => notice(msg, e.message || String(e), 'error');
+
+    async function loadMe() {
+      const me = await api('/api/academy/me');
+      if (!me.loggedIn) {
+        const next = params.get('next');
+        location.replace('/academy/login' + (next ? `?next=${encodeURIComponent(next)}` : ''));
+        return null;
+      }
+      return me;
+    }
+
+    function header(me) {
+      const who = document.getElementById('who');
+      who.innerHTML = `${esc(me.name || me.email)} · ${me.admin ? '<a href="/academy/admin">Camila’s tools</a> · ' : ''}<button type="button" id="out">Log out</button>`;
+      document.getElementById('out').onclick = async () => { await logout().catch(() => {}); location.href = '/creator-academy'; };
+    }
+
+    // ── Not a member yet ──────────────────────────────────────────
+    function renderJoin(me, content) {
+      const opens = fmtDate(me.opensAt, { weekday: 'long', month: 'long', day: 'numeric' });
+      let status = '';
+      if (me.status === 'past_due' || me.status === 'unpaid')
+        status = `<div class="notice notice-warn">Your last payment didn’t go through, so your access is paused. <button class="linkish" data-portal>Update your card</button> and you’re right back in.</div>`;
+      else if (me.status === 'canceled')
+        status = `<div class="notice notice-info">Your membership has ended. We’d love to have you back whenever you’re ready.</div>`;
+
+      const trial = me.trialAvailable;
+      const join = me.open
+        ? `<div class="price-row">
+             <div class="card feature"><span class="badge">Most flexible</span><div class="kicker">Monthly</div>
+               <div class="price-big">$88 <span>/ month</span></div>
+               <p>${trial ? 'Start with 7 days free. ' : ''}Cancel anytime from your account.</p>
+               <div class="actions"><button class="btn-primary" data-plan="monthly">${trial ? 'Start 7-day free trial' : 'Join monthly'}</button></div></div>
+             <div class="card"><div class="kicker">Yearly</div>
+               <div class="price-big">$880 <span>/ year</span></div>
+               <p>Two months free. One payment, a full year.</p>
+               <div class="actions"><button class="btn-outline" data-plan="yearly">Join yearly</button></div></div>
+           </div>
+           <p class="fine">Have a code? Enter it at checkout.</p>`
+        : `<div class="card"><div class="kicker">Almost time</div><h3>Doors open ${esc(opens)}</h3><p>Your account is ready. Come back on opening day to choose your plan.</p></div>`;
+
+      const fz = content?.founders?.zoomUrl;
+      const founders = `<div class="card"><div class="kicker">Free · Live on Zoom</div><h3>The Founders Call · Tue, Nov 10 · 6:00 PM PT</h3>
+        ${me.foundersRsvp
+          ? `<p>You’re on the list ✦ ${fz ? 'Here’s your link:' : 'Your Zoom link will appear here before the call.'}</p>${fz ? `<div class="actions"><a class="btn-primary" href="${esc(fz)}" target="_blank" rel="noopener">Join the Founders Call</a></div>` : ''}`
+          : `<p>A real teaching you can use that night, plus the founding-member offer, shared only on this call.</p><div class="actions"><button class="btn-primary" id="rsvp">Save my spot (free)</button></div>`}
+      </div>`;
+
+      app.innerHTML = `<div class="ac-section">${status}<h2>Join the Academy</h2>${join}<h2>Founders Call</h2>${founders}</div>`;
+      app.querySelectorAll('[data-plan]').forEach((b) => (b.onclick = () => busy(b, () => startCheckout(b.dataset.plan).catch(fail))));
+      app.querySelectorAll('[data-portal]').forEach((b) => (b.onclick = () => busy(b, openPortal)));
+      const r = document.getElementById('rsvp');
+      if (r) r.onclick = () => busy(r, async () => { await api('/api/academy/me', { foundersRsvp: true }); await boot(); });
+    }
+
+    async function openPortal() {
+      try { const { url } = await api('/api/academy/portal', {}); location.href = url; } catch (e) { fail(e); }
+    }
+
+    // ── Members area ──────────────────────────────────────────────
+    const TABS = [['call', 'This week'], ['feed', 'Prompts & community'], ['replays', 'Replays'], ['account', 'Account']];
+
+    function renderMember(me, c) {
+      app.innerHTML = `
+        <nav class="ac-tabs">${TABS.map(([id, label]) => `<a href="#${id}" data-tab="${id}">${label}</a>`).join('')}</nav>
+        <section class="ac-section" id="tab-call"></section>
+        <section class="ac-section" id="tab-feed"></section>
+        <section class="ac-section" id="tab-replays"></section>
+        <section class="ac-section" id="tab-account"></section>`;
+
+      // This week
+      const latestPrompt = c.posts.find((p) => p.kind === 'prompt');
+      document.getElementById('tab-call').innerHTML = `
+        ${c.welcome ? `<div class="notice notice-info">${rich(c.welcome)}</div>` : ''}
+        <div class="card call-card"><div class="kicker">Weekly live call</div><h3>${esc(c.call.title)}</h3>
+          ${c.call.when ? `<p>${esc(c.call.when)}</p>` : ''}
+          ${c.call.next ? `<p class="meta">Next call: ${esc(fmtDateTime(c.call.next))}</p>` : ''}
+          <div class="actions">${c.call.zoomUrl ? `<a class="btn-primary" href="${esc(c.call.zoomUrl)}" target="_blank" rel="noopener">Join on Zoom</a>` : '<span class="muted">The Zoom link will appear here before the call.</span>'}</div></div>
+        ${latestPrompt ? `<div class="card"><div class="kicker">This week’s prompt</div><h3>${esc(latestPrompt.title)}</h3><div class="post-body">${rich(latestPrompt.body)}</div>
+          <div class="actions"><a class="btn-outline" href="#feed" data-tab="feed">Share yours</a></div></div>` : ''}
+        ${c.founders.zoomUrl ? `<div class="card"><div class="kicker">Founders Call · Tue, Nov 10 · 6:00 PM PT</div><div class="actions"><a class="btn-outline" href="${esc(c.founders.zoomUrl)}" target="_blank" rel="noopener">Join the Founders Call</a></div></div>` : ''}`;
+
+      // Feed
+      document.getElementById('tab-feed').innerHTML = c.posts.length
+        ? c.posts.map((p) => `
+          <article class="card post" data-post="${esc(p.id)}">
+            <div class="kicker">${p.kind === 'prompt' ? 'Prompt' : 'From Camila'} · ${esc(fmtDate(p.createdAt))}</div>
+            <h3>${esc(p.title)}</h3>
+            ${p.body ? `<div class="post-body">${rich(p.body)}</div>` : ''}
+            <div class="comments">
+              ${p.comments.map((x) => `<div class="comment"><div class="by">${esc(x.name)}<time>${esc(fmtDate(x.createdAt, { month: 'short', day: 'numeric' }))}</time>
+                ${x.mine || me.admin ? `<button class="linkish" data-del="${esc(x.id)}" style="margin-left:.5rem;font-size:.72rem">delete</button>` : ''}</div>${rich(x.body)}</div>`).join('')}
+              <form class="comment-form"><textarea name="body" placeholder="${p.kind === 'prompt' ? 'Share what you made, or how it went…' : 'Reply…'}" required maxlength="4000"></textarea>
+                <button class="btn-outline" type="submit" style="justify-self:start">Post</button></form>
+            </div>
+          </article>`).join('')
+        : '<p class="muted">The first prompt drops soon.</p>';
+      app.querySelectorAll('.post').forEach((el) => {
+        const postId = el.dataset.post;
+        el.querySelector('form').onsubmit = (ev) => {
+          ev.preventDefault();
+          const body = new FormData(ev.target).get('body');
+          busy(ev.submitter, async () => { try { await api('/api/academy/comment', { postId, body }); await boot('feed'); } catch (e) { fail(e); } });
+        };
+        el.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
+          if (!confirm('Delete this comment?')) return;
+          busy(b, async () => { try { await api('/api/academy/comment', { postId, deleteId: b.dataset.del }); await boot('feed'); } catch (e) { fail(e); } });
+        }));
+      });
+
+      // Replays
+      document.getElementById('tab-replays').innerHTML = c.replays.length
+        ? `<div class="replay-list">${c.replays.map((r) => `
+            <div class="card"><div class="replay"><div><div class="kicker">${esc(fmtDate(r.date))}</div><h3>${esc(r.title)}</h3>${r.note ? `<p>${rich(r.note)}</p>` : ''}</div>
+              <button class="btn-outline" data-play="${esc(r.uid)}">Watch</button></div><div class="player-slot"></div></div>`).join('')}</div>`
+        : '<p class="muted">Replays of each weekly call will appear here.</p>';
+      app.querySelectorAll('[data-play]').forEach((b) => (b.onclick = () => busy(b, async () => {
+        try {
+          const { src } = await api(`/api/academy/replay?uid=${encodeURIComponent(b.dataset.play)}`);
+          const slot = b.closest('.card').querySelector('.player-slot');
+          slot.innerHTML = `<div class="player" style="margin-top:1rem"><iframe src="${esc(src)}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+          b.remove();
+        } catch (e) { fail(e); }
+      })));
+
+      // Account
+      const plan = me.plan === 'yearly' ? '$880 / year' : me.plan === 'monthly' ? '$88 / month' : '—';
+      const statusText = { trialing: 'Free trial', active: 'Active', past_due: 'Payment issue', canceled: 'Canceled', none: me.comp ? 'Complimentary' : '—' }[me.status] || me.status;
+      document.getElementById('tab-account').innerHTML = `
+        <div class="card"><div class="kicker">Your membership</div>
+          <dl class="kv">
+            <dt>Status</dt><dd>${esc(statusText)}</dd>
+            ${me.paid ? `<dt>Plan</dt><dd>${esc(plan)}</dd>` : ''}
+            ${me.paid && me.periodEnd ? `<dt>${me.cancelAtPeriodEnd ? 'Access until' : me.status === 'trialing' ? 'Trial ends' : 'Renews'}</dt><dd>${esc(fmtDate(me.periodEnd))}</dd>` : ''}
+            ${me.comp ? `<dt>Included access</dt><dd>Through ${esc(fmtDate(me.comp.until))}</dd>` : ''}
+            <dt>Email</dt><dd>${esc(me.email)}</dd>
+          </dl>
+          <div class="actions">${me.hasBilling ? '<button class="btn-outline" data-portal>Manage billing, plan or cancel</button>' : ''}</div>
+          ${me.comp && !me.paid ? '<p class="fine">Your access is included for now. Choose a plan any time before it ends to keep your spot.</p>' : ''}
+        </div>`;
+      app.querySelectorAll('[data-portal]').forEach((b) => (b.onclick = () => busy(b, openPortal)));
+
+      // Tabs
+      const select = (id) => {
+        if (!TABS.some(([t]) => t === id)) id = 'call';
+        TABS.forEach(([t]) => (document.getElementById(`tab-${t}`).hidden = t !== id));
+        app.querySelectorAll('.ac-tabs a').forEach((a) => a.classList.toggle('on', a.dataset.tab === id));
+      };
+      app.querySelectorAll('[data-tab]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); history.replaceState(null, '', `#${a.dataset.tab}`); select(a.dataset.tab); scrollTo({ top: 0, behavior: 'smooth' }); }));
+      select(currentTab || location.hash.slice(1));
+    }
+
+    let currentTab = null;
+    async function boot(tab) {
+      currentTab = tab || null;
+      try {
+        const me = await loadMe();
+        if (!me) return;
+        header(me);
+
+        const next = params.get('next');
+        if (next?.startsWith('checkout-') && !me.member) {
+          history.replaceState(null, '', '/academy/');
+          params.delete('next');
+          if (me.open) { notice(msg, 'Taking you to checkout…', 'info'); return startCheckout(next.replace('checkout-', '')).catch(fail); }
+        }
+        if (next === 'founders' && !me.foundersRsvp) {
+          params.delete('next');
+          await api('/api/academy/me', { foundersRsvp: true });
+          return boot();
+        }
+
+        const content = await api('/api/academy/content');
+        if (me.member || me.admin) renderMember(me, content);
+        else renderJoin(me, content);
+      } catch (e) {
+        app.innerHTML = '';
+        fail(e);
+      }
+    }
+
+    // Returning from Stripe: the webhook can take a few seconds to unlock access.
+    if (params.get('welcome')) {
+      notice(msg, 'Welcome in ✦ Setting up your membership…', 'ok');
+      history.replaceState(null, '', '/academy/');
+      for (let i = 0; i < 10; i++) {
+        const me = await api('/api/academy/me').catch(() => null);
+        if (me?.member) break;
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+      notice(msg, 'Welcome to Creator Academy ✦ You’re in.', 'ok');
+    }
+    await boot();
+
+  </script>
+</body>
+</html>
