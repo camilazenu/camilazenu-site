@@ -42,7 +42,8 @@ export default async (req: Request, context: Context) => {
     const e = err as { type?: string; message?: string; code?: string }
     console.error("Stripe call failed", e?.type, e?.code, e?.message)
     // Stripe's own error text is safe to show; it never contains keys.
-    return fail(e?.type?.startsWith("Stripe") ? `Stripe: ${e.message}` : "Checkout is unavailable right now. Please try again.", 502)
+    const keyIssue = /api key/i.test(e?.message ?? "")
+    return fail(e?.type?.startsWith("Stripe") && !keyIssue ? `Stripe: ${e.message}` : "Checkout is unavailable right now. Please try again.", 502)
   }
 }
 
