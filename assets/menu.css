@@ -3,8 +3,8 @@ body > .menu-root { position: relative; z-index: 3000; }
 .menu-btn {
   display: inline-flex; align-items: center; gap: .55rem;
   background: none; border: 0; cursor: pointer; padding: .35rem .2rem;
-  font-family: 'Inter', sans-serif; font-size: .72rem; font-weight: 600;
-  letter-spacing: .18em; text-transform: uppercase; color: var(--ink, #3A1F12);
+  font-family: var(--font-body); font-size: .72rem; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--ink);
 }
 .menu-btn .bars { display: inline-block; width: 20px; height: 12px; position: relative; }
 .menu-btn .bars::before, .menu-btn .bars::after, .menu-btn .bars span {
@@ -21,7 +21,7 @@ a.nav-logo { text-decoration: none; color: inherit; }
 }
 .menu-drawer {
   position: fixed; top: 0; left: 0; bottom: 0; width: min(380px, 88vw); z-index: 2001;
-  background: var(--linen-soft, #FAF1E2); color: var(--ink, #3A1F12);
+  background: var(--linen-soft); color: var(--ink);
   transform: translateX(-102%); transition: transform .3s ease;
   overflow-y: auto; padding: 1.4rem 1.6rem 2.5rem; box-shadow: 8px 0 40px rgba(26,42,31,.18);
 }
@@ -30,34 +30,34 @@ body.menu-open .menu-drawer { transform: translateX(0); }
 body.menu-open { overflow: hidden; }
 .menu-close {
   background: none; border: 0; cursor: pointer; font-size: 1.6rem; line-height: 1;
-  color: var(--ink, #3A1F12); float: right;
+  color: var(--ink); float: right;
 }
 .menu-brand {
-  font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600;
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 600;
   margin: .2rem 0 1.4rem; letter-spacing: .02em;
 }
 .menu-list { list-style: none; margin: 0; padding: 0; clear: both; }
 .menu-list > li { border-bottom: 1px solid rgba(58,31,18,.12); }
 .menu-list a, .menu-list summary {
   display: block; padding: .85rem 0; text-decoration: none; color: inherit; cursor: pointer;
-  font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500;
+  font-family: var(--font-display); font-size: 1.35rem; font-weight: 500;
 }
-.menu-list a:hover, .menu-list summary:hover { color: var(--henna, #6B2F1E); }
+.menu-list a:hover, .menu-list summary:hover { color: var(--henna); }
 .menu-list summary { list-style: none; }
 .menu-list summary::-webkit-details-marker { display: none; }
-.menu-list summary::after { content: '+'; float: right; font-family: 'Inter', sans-serif; font-weight: 400; }
+.menu-list summary::after { content: '+'; float: right; font-family: var(--font-body); font-weight: 400; }
 .menu-list details[open] > summary::after { content: '–'; }
 .menu-sub { list-style: none; padding: 0 0 .7rem .9rem; margin: 0; }
-.menu-sub a { font-family: 'Lora', serif; font-size: 1.02rem; padding: .45rem 0; }
-.menu-sub small { display: block; font-family: 'Inter', sans-serif; font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: -.2rem; }
-.menu-list > li > a small { display: block; font-family: 'Inter', sans-serif; font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: .1rem; }
+.menu-sub a { font-family: var(--font-body); font-size: 1.02rem; padding: .45rem 0; }
+.menu-sub small { display: block; font-family: var(--font-body); font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: -.2rem; }
+.menu-list > li > a small { display: block; font-family: var(--font-body); font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: .1rem; }
 .menu-tag {
-  font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 600; letter-spacing: .12em;
-  text-transform: uppercase; background: var(--saffron, #C29030); color: #fff;
+  font-family: var(--font-body); font-size: .62rem; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; background: var(--saffron); color: #fff;
   padding: .15rem .45rem; border-radius: 3px; margin-left: .45rem; vertical-align: middle;
 }
-.menu-foot { margin-top: 1.6rem; font-family: 'Inter', sans-serif; font-size: .82rem; line-height: 1.9; }
-.menu-foot a { color: var(--henna, #6B2F1E); }
+.menu-foot { margin-top: 1.6rem; font-family: var(--font-body); font-size: .82rem; line-height: 1.9; }
+.menu-foot a { color: var(--henna); }
 @media (max-width: 640px) {
   .nav-right .nav-link { display: none; }
   .nav-right .nav-cta { padding: .45rem .8rem; font-size: .64rem; letter-spacing: .1em; white-space: nowrap; }
@@ -66,29 +66,29 @@ body.menu-open { overflow: hidden; }
 }
 
 /* Book a call */
-.menu-list a.menu-book { color: var(--henna, #6B2F1E); }
+.menu-list a.menu-book { color: var(--henna); }
 
 /* Newsletter invite */
 .nl-root { position: fixed; inset: 0; z-index: 4000; display: grid; place-items: center; padding: 1.2rem; opacity: 0; transition: opacity .3s ease; }
 .nl-root.on { opacity: 1; }
 .nl-overlay { position: absolute; inset: 0; background: rgba(26, 42, 31, .5); }
 .nl-card {
-  position: relative; width: min(460px, 100%); background: var(--linen-soft, #FAF1E2); color: var(--ink, #3A1F12);
+  position: relative; width: min(460px, 100%); background: var(--linen-soft); color: var(--ink);
   border: 1px solid rgba(184,152,90,.45); border-radius: 8px; padding: 2rem 1.8rem 1.2rem; text-align: center;
   box-shadow: 0 24px 60px rgba(26,42,31,.3); transform: translateY(12px); transition: transform .3s ease;
 }
 .nl-root.on .nl-card { transform: none; }
 .nl-x { position: absolute; top: .6rem; right: .8rem; background: none; border: 0; font-size: 1.6rem; line-height: 1; cursor: pointer; color: inherit; }
-.nl-kicker { font-family: 'Inter', sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--moss, #5C6B4A); }
-.nl-card h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 2rem; line-height: 1.1; margin: .4rem 0 .6rem; color: var(--forest, #1A2A1F); }
-.nl-card h2 em { color: var(--saffron, #C29030); }
-.nl-card p { font-family: 'Lora', serif; font-size: .98rem; line-height: 1.6; margin: 0 0 1rem; }
+.nl-kicker { font-family: var(--font-body); font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--moss); }
+.nl-card h2 { font-family: var(--font-display); font-weight: 500; font-size: 2rem; line-height: 1.1; margin: .4rem 0 .6rem; color: var(--forest); }
+.nl-card h2 em { color: var(--saffron); }
+.nl-card p { font-family: var(--font-body); font-size: .98rem; line-height: 1.6; margin: 0 0 1rem; }
 .nl-form { display: grid; gap: .55rem; }
-.nl-form input { font: 400 1rem 'Lora', serif; padding: .75rem .85rem; border: 1px solid rgba(184,152,90,.55); border-radius: 5px; background: #fffdf7; color: var(--forest, #1A2A1F); width: 100%; }
-.nl-form input:focus { outline: 2px solid var(--saffron, #C29030); outline-offset: 1px; }
-.nl-form button { font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: .9rem 1rem; border: 0; border-radius: 5px; background: var(--forest, #1A2A1F); color: var(--linen, #F5EBDC); cursor: pointer; }
+.nl-form input { font: 400 1rem var(--font-body); padding: .75rem .85rem; border: 1px solid rgba(184,152,90,.55); border-radius: 5px; background: #fffdf7; color: var(--forest); width: 100%; }
+.nl-form input:focus { outline: 2px solid var(--saffron); outline-offset: 1px; }
+.nl-form button { font-family: var(--font-body); font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: .9rem 1rem; border: 0; border-radius: 5px; background: var(--forest); color: var(--linen); cursor: pointer; }
 .nl-form button[disabled] { opacity: .65; cursor: progress; }
 .nl-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
-.nl-msg { font-family: 'Inter', sans-serif; font-size: .78rem; color: #7a2323; margin: 0; }
-.nl-done { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--forest, #1A2A1F); margin: .6rem 0; }
-.nl-no { background: none; border: 0; cursor: pointer; font-family: 'Inter', sans-serif; font-size: .74rem; color: var(--henna, #6B2F1E); text-decoration: underline; margin: .7rem .5rem 0; }
+.nl-msg { font-family: var(--font-body); font-size: .78rem; color: #7a2323; margin: 0; }
+.nl-done { font-family: var(--font-display); font-size: 1.4rem; color: var(--forest); margin: .6rem 0; }
+.nl-no { background: none; border: 0; cursor: pointer; font-family: var(--font-body); font-size: .74rem; color: var(--henna); text-decoration: underline; margin: .7rem .5rem 0; }

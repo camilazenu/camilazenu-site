@@ -6,38 +6,57 @@
   <title>About Camila Zenu · Creator Consciousness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital@0,400;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* Warm Devotional family */
-      --linen: #F4E6D2;
-      --linen-soft: #FAF1E2;
-      --wheat: #E4C9A6;
-      --saffron: #C29030;
-      --saffron-light: #D9A95A;
-      --henna: #6B2F1E;
-      --henna-light: #8B4632;
-      --earth: #3A1F12;
-      /* Jungle Canopy family */
-      --sage-mist: #A8B89E;
-      --moss: #6B8268;
-      --jungle: #2D4A35;
-      --canopy: #1B3424;
-      --forest-deep: #1A2A1F;
-      /* Legacy aliases */
-      --beige-light: var(--linen);
-      --beige: #EBD7B8;
-      --beige-deep: var(--wheat);
-      --parchment: var(--linen);
-      --sand: var(--wheat);
-      --gold: var(--saffron);
-      --gold-light: var(--saffron-light);
-      --sage: var(--sage-mist);
-      --sage-deep: var(--moss);
-      --forest: var(--jungle);
-      --umber: var(--henna);
-      --umber-light: var(--henna-light);
-      --ink: var(--earth);
+      /* Brand tokens: bone, stone, brown, one clay accent */
+      --bone: #F4EFE7;
+      --paper: #FBF8F2;
+      --stone-light: #E9E2D6;
+      --stone: #DCD3C5;
+      --line: #D6CCBD;
+      --taupe: #6F5F50;
+      --clay: #8F5A3C;
+      --clay-soft: #D8BFA8;
+      --brown: #5A3A28;
+      --brown-deep: #4A2F20;
+      --font-display: 'Libre Caslon Display', Georgia, serif;
+      --font-quote: 'Libre Caslon Text', Georgia, serif;
+      --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+      /* Older names, mapped so every page picks up the brand */
+      --linen: var(--bone);
+      --linen-soft: var(--paper);
+      --wheat: var(--stone);
+      --saffron: var(--clay);
+      --saffron-light: var(--clay-soft);
+      --henna: var(--taupe);
+      --henna-light: var(--taupe);
+      --earth: var(--brown-deep);
+      --sage-mist: var(--stone);
+      --moss: var(--clay);
+      --jungle: var(--brown);
+      --canopy: var(--brown);
+      --forest-deep: var(--brown-deep);
+      --beige-light: var(--bone);
+      --beige: var(--stone-light);
+      --beige-deep: var(--stone);
+      --parchment: var(--bone);
+      --parchment-dark: var(--stone);
+      --sand: var(--stone);
+      --terra: var(--clay);
+      --terra-dark: var(--clay);
+      --gold: var(--clay);
+      --gold-light: var(--clay-soft);
+      --sage: var(--stone);
+      --sage-deep: var(--clay);
+      --moss-light: var(--clay);
+      --forest: var(--brown);
+      --umber: var(--taupe);
+      --umber-light: var(--taupe);
+      --cream: var(--paper);
+      --ink: var(--brown-deep);
+      --dark: var(--brown-deep);
+      --dark-nav: var(--brown);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,7 +64,7 @@
     body {
       -webkit-font-smoothing: antialiased;
       color: var(--ink);
-      font-family: 'Lora', Georgia, serif;
+      font-family: var(--font-body);
       font-size: 1.05rem;
       line-height: 1.8;
       background-color: var(--beige-light);
@@ -99,7 +118,7 @@
     body > * { position: relative; z-index: 1; }
     @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
     h1, h2, h3, h4, h5, h6 {
-      font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
+      font-family: var(--font-display);
       letter-spacing: -0.012em;
     }
 
@@ -125,7 +144,7 @@
       justify-content: space-between;
     }
     .nav-logo {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--forest);
@@ -134,7 +153,7 @@
     }
     .nav-right { display: flex; align-items: center; gap: 1.75rem; }
     .nav-link {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
       letter-spacing: .18em;
@@ -146,7 +165,7 @@
     }
     .nav-link:hover { border-bottom-color: var(--sage-deep); color: var(--moss); }
     .nav-cta {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -165,7 +184,7 @@
       text-align: center;
     }
     .about-hero .eyebrow {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
       letter-spacing: .28em;
@@ -174,7 +193,7 @@
       margin-bottom: 1.25rem;
     }
     .about-hero h1 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(2.6rem, 6vw, 4.4rem);
       font-style: italic;
       font-weight: 600;
@@ -184,7 +203,7 @@
       margin-bottom: 1rem;
     }
     .about-hero .subtitle {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-size: clamp(1.05rem, 2vw, 1.25rem);
       color: var(--umber);
@@ -243,7 +262,7 @@
     }
     .story p .lead-cap {
       float: left;
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-size: 3.4rem;
       line-height: .9;
@@ -267,7 +286,7 @@
       text-align: center;
     }
     .quote-band blockquote {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-size: clamp(1.25rem, 2.4vw, 1.7rem);
       color: var(--beige-light);
@@ -282,7 +301,7 @@
       padding: 70px 2rem;
     }
     .creds-title {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
       letter-spacing: .28em;
@@ -292,7 +311,7 @@
       margin-bottom: 1rem;
     }
     .creds-heading {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-weight: 600;
       font-size: clamp(1.7rem, 3.4vw, 2.4rem);
@@ -313,7 +332,7 @@
       padding: 1.6rem 1.4rem;
     }
     .cred-card h3 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-weight: 600;
       font-size: 1.05rem;
@@ -347,7 +366,7 @@
       padding: 90px 2rem;
     }
     .cta-band h2 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-style: italic;
       font-weight: 600;
       font-size: clamp(1.8rem, 3.6vw, 2.5rem);
@@ -364,7 +383,7 @@
       display: inline-block;
       background: linear-gradient(135deg, var(--sage-deep), var(--moss));
       color: #fdfaf2;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -382,7 +401,7 @@
       background: transparent;
       border: 1px solid var(--sage-deep);
       color: var(--sage-deep);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -402,7 +421,7 @@
       text-align: center;
       padding: 2.5rem 2rem;
       font-size: .82rem;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       letter-spacing: .06em;
     }
     footer a { color: var(--gold-light); }

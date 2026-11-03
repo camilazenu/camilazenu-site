@@ -1,41 +1,53 @@
 /* ── Design Tokens · Brand Kit 2026 ──────────────────────────── */
     :root {
-      /* Warm Devotional family */
-      --linen: #F4E6D2;
-      --linen-soft: #FAF1E2;
-      --wheat: #E4C9A6;
-      --saffron: #C29030;
-      --saffron-light: #D9A95A;
-      --henna: #6B2F1E;
-      --henna-light: #8B4632;
-      --earth: #3A1F12;
-      /* Jungle Canopy family */
-      --sage-mist: #A8B89E;
-      --moss: #6B8268;
-      --jungle: #2D4A35;
-      --canopy: #1B3424;
-      --forest-deep: #1A2A1F;
-      /* Legacy aliases (mapped to brand) */
-      --beige-light: var(--linen);
-      --beige: #EBD7B8;
-      --beige-deep: var(--wheat);
-      --parchment: var(--linen);
-      --parchment-dark: var(--wheat);
-      --sand: var(--wheat);
-      --terra: var(--henna);
-      --terra-dark: var(--henna);
-      --gold: var(--saffron);
-      --gold-light: var(--saffron-light);
-      --sage: var(--sage-mist);
-      --sage-deep: var(--moss);
-      --moss-light: var(--moss);
-      --forest: var(--jungle);
-      --umber: var(--henna);
-      --umber-light: var(--henna-light);
-      --cream: var(--linen-soft);
-      --ink: var(--earth);
-      --dark: var(--forest-deep);
-      --dark-nav: var(--canopy);
+      /* Brand tokens: bone, stone, brown, one clay accent */
+      --bone: #F4EFE7;
+      --paper: #FBF8F2;
+      --stone-light: #E9E2D6;
+      --stone: #DCD3C5;
+      --line: #D6CCBD;
+      --taupe: #6F5F50;
+      --clay: #8F5A3C;
+      --clay-soft: #D8BFA8;
+      --brown: #5A3A28;
+      --brown-deep: #4A2F20;
+      --font-display: 'Libre Caslon Display', Georgia, serif;
+      --font-quote: 'Libre Caslon Text', Georgia, serif;
+      --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+      /* Older names, mapped so every page picks up the brand */
+      --linen: var(--bone);
+      --linen-soft: var(--paper);
+      --wheat: var(--stone);
+      --saffron: var(--clay);
+      --saffron-light: var(--clay-soft);
+      --henna: var(--taupe);
+      --henna-light: var(--taupe);
+      --earth: var(--brown-deep);
+      --sage-mist: var(--stone);
+      --moss: var(--clay);
+      --jungle: var(--brown);
+      --canopy: var(--brown);
+      --forest-deep: var(--brown-deep);
+      --beige-light: var(--bone);
+      --beige: var(--stone-light);
+      --beige-deep: var(--stone);
+      --parchment: var(--bone);
+      --parchment-dark: var(--stone);
+      --sand: var(--stone);
+      --terra: var(--clay);
+      --terra-dark: var(--clay);
+      --gold: var(--clay);
+      --gold-light: var(--clay-soft);
+      --sage: var(--stone);
+      --sage-deep: var(--clay);
+      --moss-light: var(--clay);
+      --forest: var(--brown);
+      --umber: var(--taupe);
+      --umber-light: var(--taupe);
+      --cream: var(--paper);
+      --ink: var(--brown-deep);
+      --dark: var(--brown-deep);
+      --dark-nav: var(--brown);
     }
 
     /* ── Reset ───────────────────────────────────────────────────── */
@@ -44,7 +56,7 @@
     body {
       -webkit-font-smoothing: antialiased;
       color: var(--ink);
-      font-family: 'Lora', Georgia, serif;
+      font-family: var(--font-body);
       font-size: 1.05rem;
       line-height: 1.75;
       background-color: var(--beige-light);
@@ -100,7 +112,7 @@
       body::before { animation: none; }
     }
     h1, h2, h3, h4, h5, h6 {
-      font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
+      font-family: var(--font-display);
       letter-spacing: -0.005em;
       font-weight: 500;
       line-height: 1.18;
@@ -122,7 +134,7 @@
       display: inline-block;
       background: linear-gradient(135deg, var(--saffron-light), var(--saffron));
       color: var(--linen-soft);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -144,7 +156,7 @@
       background: transparent;
       border: 1px solid var(--gold-light);
       color: var(--gold-light);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -205,7 +217,7 @@
       justify-content: space-between;
     }
     .nav-logo {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--forest);
@@ -218,7 +230,7 @@
       gap: 1.75rem;
     }
     .nav-link {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
       letter-spacing: .18em;
@@ -230,7 +242,7 @@
     }
     .nav-link:hover { border-bottom-color: var(--sage-deep); color: var(--moss); }
     .nav-cta {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
       letter-spacing: .14em;
@@ -264,7 +276,7 @@
     .hero-heading {
       position: relative;
       z-index: 2;
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(3.5rem, 10vw, 8rem);
       font-weight: 500;
       line-height: 1.04;
@@ -284,7 +296,7 @@
       color: var(--ink);
       font-weight: 400;
       letter-spacing: .03em;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-style: italic;
     }
     .hero-badges {
@@ -298,7 +310,7 @@
       margin-top: 2rem;
       font-size: .8rem;
       color: var(--umber);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-weight: 500;
       letter-spacing: .1em;
       text-transform: uppercase;
@@ -329,7 +341,7 @@
       font-size: .82rem;
       color: var(--umber-light);
       letter-spacing: .08em;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
 
     /* ── Sections ────────────────────────────────────────────────── */
@@ -344,7 +356,7 @@
       padding: 80px 2rem;
     }
     .section-label {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
       letter-spacing: .28em;
@@ -377,7 +389,7 @@
       text-align: center;
       color: var(--umber);
       font-size: 1.05rem;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-style: italic;
       margin-bottom: 3.5rem;
       line-height: 1.7;
@@ -489,7 +501,7 @@
       z-index: 1;
     }
     .pull-quote blockquote {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(1.35rem, 2.6vw, 1.85rem);
       font-style: italic;
       color: var(--beige-light);
@@ -517,7 +529,7 @@
       box-shadow: 0 14px 32px rgba(61,90,61,0.10);
     }
     .creator-letter {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 2.75rem;
       font-weight: 600;
       font-style: italic;
@@ -567,7 +579,7 @@
     .week-header {
       padding: 1.25rem 1.5rem;
       color: var(--beige-light);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
     .week-header .week-num {
       font-size: .68rem;
@@ -577,7 +589,7 @@
       opacity: .9;
     }
     .week-header h3 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1.15rem;
       font-weight: 600;
       font-style: italic;
@@ -588,7 +600,7 @@
       opacity: .88;
       margin-top: .35rem;
       line-height: 1.5;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-style: italic;
     }
     .week-terra .week-header { background: linear-gradient(135deg, var(--sage-deep), var(--moss)); }
@@ -637,7 +649,7 @@
       flex-shrink: 0;
     }
     .included-card h4 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 600;
       font-style: italic;
@@ -678,7 +690,7 @@
     .bonus-emoji { font-size: 1.85rem; margin-bottom: .85rem; }
     .bonus-value {
       display: inline-block;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .68rem;
       font-weight: 500;
       letter-spacing: .18em;
@@ -704,7 +716,7 @@
     .bonus-total {
       text-align: center;
       margin-top: 2.5rem;
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1rem;
       font-style: italic;
       color: var(--umber);
@@ -739,7 +751,7 @@
       transform: translateX(-50%);
       background: var(--sage-deep);
       color: var(--beige-light);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .68rem;
       font-weight: 500;
       letter-spacing: .22em;
@@ -749,7 +761,7 @@
       white-space: nowrap;
     }
     .price-label {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
       letter-spacing: .22em;
@@ -757,7 +769,7 @@
       color: var(--sage-deep);
     }
     .price-amount {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 2.75rem;
       font-weight: 600;
       font-style: italic;
@@ -767,7 +779,7 @@
     .price-note {
       font-size: .9rem;
       color: var(--umber);
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-style: italic;
     }
     .price-card .btn-primary { width: 100%; text-align: center; }
@@ -828,7 +840,7 @@
       z-index: 1;
     }
     .final-quote {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(1.7rem, 3.6vw, 2.5rem);
       font-style: italic;
       color: var(--gold-light);
@@ -840,7 +852,7 @@
       color: var(--beige);
       letter-spacing: .2em;
       text-transform: uppercase;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       margin-bottom: 3rem;
     }
     .final-body {
@@ -848,7 +860,7 @@
       color: var(--beige-light);
       line-height: 1.85;
       margin-bottom: .75rem;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
     }
     .final-sub {
       font-size: .78rem;
@@ -856,7 +868,7 @@
       margin-bottom: 2.75rem;
       letter-spacing: .18em;
       text-transform: uppercase;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
     .final-cta .btn-primary {
       background: linear-gradient(135deg, var(--gold-light), var(--gold));
@@ -868,7 +880,7 @@
       margin-top: 1.5rem;
       letter-spacing: .14em;
       text-transform: uppercase;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
     }
 
     /* ── Footer ──────────────────────────────────────────────────── */
@@ -878,7 +890,7 @@
       text-align: center;
       padding: 2.5rem 2rem;
       font-size: .82rem;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       letter-spacing: .06em;
     }
     footer a { color: var(--gold-light); }
@@ -890,7 +902,7 @@
       font-size: .82rem;
       color: var(--umber);
       margin-top: 1.25rem;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-style: italic;
     }
     .secure-note a { color: var(--sage-deep); text-decoration: underline; }
@@ -901,7 +913,7 @@
       margin: -1.5rem auto 2.5rem;
       padding: .9rem 1.4rem;
       text-align: center;
-      font-family: 'Lora', serif;
+      font-family: var(--font-body);
       font-size: .98rem;
       line-height: 1.6;
       color: var(--umber);
@@ -912,7 +924,7 @@
     .early-bird-banner strong { color: var(--forest); font-weight: 600; }
     .eb-pill {
       display: inline-block;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .68rem;
       font-weight: 600;
       letter-spacing: .22em;
@@ -925,7 +937,7 @@
       vertical-align: middle;
     }
     .price-strike {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .78rem;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -941,7 +953,7 @@
       margin-left: .25rem;
     }
     .price-fine {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .7rem;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -993,7 +1005,7 @@
     .about-teaser-text { flex: 1 1 320px; }
     .about-teaser-text .section-label { text-align: left; margin-bottom: .75rem; }
     .about-teaser-text h2 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(1.8rem, 3.4vw, 2.4rem);
       font-style: italic;
       font-weight: 600;
