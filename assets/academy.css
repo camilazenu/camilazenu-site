@@ -67,3 +67,26 @@ button[disabled] { opacity: .6; cursor: progress; }
 progress { width: 100%; height: 10px; accent-color: var(--saffron); }
 .muted { color: var(--henna); }
 .loading { text-align: center; padding: 3rem 0; color: var(--henna); }
+
+/* ── Brand refresh: Academy ────────────────────────────────────── */
+.ac-head h1 { font-weight: 400; color: var(--brown); font-size: clamp(2.6rem, 6vw, 3.8rem); }
+.ac-head h1 em { color: inherit; }
+.ac-head .who { font-size: .9rem; color: var(--taupe); }
+.ac-tabs { border-bottom-color: var(--line); }
+.ac-tabs a { font-size: .95rem; font-weight: 500; color: var(--taupe); }
+.ac-tabs a.on { color: var(--brown); border-color: var(--brown); }
+.ac-section h2 { font-weight: 400; color: var(--brown); font-size: 2.2rem; }
+.ac-form label { font-size: .9rem; font-weight: 500; color: var(--brown); }
+.ac-form input, .ac-form textarea, .ac-form select, .comment-form textarea { border-color: var(--line); color: var(--brown-deep); }
+.ac-form input:focus, .ac-form textarea:focus { outline-color: var(--clay); }
+.auth-switch button { font-size: .92rem; font-weight: 500; border-color: var(--line); color: var(--taupe); }
+.auth-switch button.on { background: var(--brown); border-color: var(--brown); color: var(--bone); }
+.notice-info { background: var(--paper); border-color: var(--line); color: var(--brown); }
+.kv dt, .ac-table th { font-size: .85rem; font-weight: 500; color: var(--taupe); }
+.comment .by { font-size: .85rem; color: var(--clay); }
+.comment .by time { color: var(--taupe); }
+.muted, .loading { color: var(--taupe); }
+.linkish, .ac-head .who button { color: var(--clay); }
+.post .kicker { color: var(--clay); }
+progress { accent-color: var(--brown); }
+.pill { font-size: .78rem; }

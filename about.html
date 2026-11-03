@@ -6,7 +6,7 @@
   <title>About Camila Zenu · Creator Consciousness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital@0,400;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
       /* Brand tokens: bone, stone, brown, one clay accent */
@@ -16,7 +16,7 @@
       --stone: #DCD3C5;
       --line: #D6CCBD;
       --taupe: #6F5F50;
-      --clay: #8F5A3C;
+      --clay: #865334;
       --clay-soft: #D8BFA8;
       --brown: #5A3A28;
       --brown-deep: #4A2F20;
@@ -363,6 +363,63 @@
       .nav-link { font-size: .68rem; }
 
     }
+
+    /* ── Brand refresh: shared refinements ──────────────────────── */
+    body { background: var(--bone); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; font-synthesis: none; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 400; color: var(--brown); }
+    em, i, .italic { color: inherit; }
+    .text-gradient-gold { color: inherit; }
+    .reveal { transform: translateY(12px); transition: opacity .5s, transform .5s; }
+
+    .btn-primary, .btn-outline {
+      display: inline-block; font-family: var(--font-body); font-size: .95rem; font-weight: 500;
+      padding: .85rem 1.6rem; border-radius: 2px; border: 1px solid var(--brown);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .btn-primary, .btn-gold { background: var(--brown); color: var(--bone); }
+    .btn-primary:hover { background: var(--brown-deep); border-color: var(--brown-deep); opacity: 1; }
+    .btn-outline, .hero-actions .btn-outline, .about-teaser-text .btn-outline { background: transparent; color: var(--brown); border-color: var(--brown); }
+    .btn-outline:hover, .hero-actions .btn-outline:hover, .about-teaser-text .btn-outline:hover { background: var(--brown); color: var(--bone); }
+
+    .nav-fixed { background: var(--bone); border-bottom: 1px solid var(--line); }
+    .nav-logo { font-family: var(--font-quote); font-size: 1.08rem; font-weight: 400; color: var(--brown); }
+    .nav-link { font-size: .95rem; color: var(--brown); }
+    .nav-link:hover { border-bottom-color: var(--brown); color: var(--brown); }
+    .nav-cta { font-size: .95rem; color: var(--brown); border-color: var(--brown); }
+    .nav-cta:hover { background: var(--brown); color: var(--bone); }
+
+    footer { background: var(--brown); color: var(--stone); font-size: .9rem; }
+    footer a { color: var(--bone); text-decoration: underline; text-underline-offset: 2px; }
+    .ornament { display: none; }
+
+    /* About page */
+    .about-hero { max-width: 720px; margin: 0 auto; padding: 140px 2rem 32px; text-align: left; }
+    .about-hero .eyebrow { font-size: .95rem; color: var(--clay); margin-bottom: .75rem; }
+    .about-hero h1 { font-family: var(--font-display); font-weight: 400; color: var(--brown); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.02; }
+    .about-hero .subtitle { font-family: var(--font-body); color: var(--taupe); margin: 0; }
+    .photo-frame { max-width: none; margin-top: 1.75rem; }
+    .photo-frame img { border-radius: 0; }
+    .story p .lead-cap { font-family: var(--font-display); color: var(--clay); }
+    .story p strong { color: var(--brown); }
+    .story p em { color: inherit; }
+    .quote-band { background: var(--brown); }
+    .quote-band blockquote { font-family: var(--font-quote); font-style: italic; color: var(--bone); }
+    .quote-band blockquote span { color: var(--clay-soft); }
+    .creds-title { font-size: .95rem; color: var(--clay); text-align: left; }
+    .creds-heading { font-family: var(--font-display); font-weight: 400; color: var(--brown); text-align: left; font-size: clamp(2rem, 4vw, 2.8rem); }
+    .cred-card { background: transparent; border: 0; border-top: 1px solid var(--brown); border-radius: 0; padding: 1.1rem 0 0; }
+    .cred-card h3 { font-family: var(--font-quote); font-weight: 400; font-size: 1.15rem; }
+    .headshot-inset { border: 0; }
+    .cta-band { background: var(--stone-light); border: 0; }
+    .cta-band h2 { font-family: var(--font-display); font-weight: 400; color: var(--brown); font-size: clamp(2rem, 4vw, 2.8rem); }
+    .cta-band p { color: var(--taupe); }
+    @media (max-width: 640px) {
+      .about-hero { padding: 104px 1.25rem 24px; }
+      .story, .creds-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+    }
+
+    /* Long Book a Call label: drop the wordmark on phones so it fits */
+    @media (max-width: 640px) { .nav-logo { display: none; } }
   </style>
   <link rel="stylesheet" href="/assets/menu.css" />
 </head>

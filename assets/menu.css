@@ -89,3 +89,27 @@ body.menu-open { overflow: hidden; }
 .nl-msg { font-family: var(--font-body); font-size: .78rem; color: #7a2323; margin: 0; }
 .nl-done { font-family: var(--font-display); font-size: 1.4rem; color: var(--forest); margin: .6rem 0; }
 .nl-no { background: none; border: 0; cursor: pointer; font-family: var(--font-body); font-size: .74rem; color: var(--henna); text-decoration: underline; margin: .7rem .5rem 0; }
+
+/* ── Brand refresh: menu and newsletter ────────────────────────── */
+.menu-btn { font-size: .95rem; font-weight: 500; color: var(--brown); }
+.menu-drawer { background: var(--paper); border-right: 1px solid var(--line); }
+.menu-brand { font-family: var(--font-display); font-weight: 400; color: var(--brown); }
+.menu-list a, .menu-list summary { font-family: var(--font-display); font-weight: 400; color: var(--brown); }
+.menu-list a:hover, .menu-list summary:hover { color: var(--clay); }
+.menu-sub a { font-family: var(--font-body); }
+.menu-sub small, .menu-list > li > a small { font-size: .82rem; opacity: 1; color: var(--taupe); }
+.menu-tag { background: var(--clay); color: var(--paper); font-size: .72rem; font-family: var(--font-body); }
+.menu-foot a, .menu-list a.menu-book { color: var(--clay); }
+.nl-card { background: var(--paper); border-color: var(--line); }
+.nl-kicker { font-size: .9rem; font-weight: 500; color: var(--clay); }
+.nl-card h2 { font-weight: 400; color: var(--brown); font-size: 2.3rem; }
+.nl-card h2 em { color: inherit; }
+.nl-form input { border-color: var(--line); color: var(--brown-deep); }
+.nl-form input:focus { outline-color: var(--clay); }
+.nl-form button { font-size: .95rem; font-weight: 500; background: var(--brown); color: var(--bone); }
+.nl-done { font-family: var(--font-display); color: var(--brown); }
+.nl-no { font-size: .88rem; color: var(--taupe); }
+@media (max-width: 640px) {
+  .nav-right .nav-cta { font-size: .85rem; padding: .4rem .7rem; }
+  .nav-logo { font-size: 1rem; }
+}
