@@ -21,7 +21,7 @@
         { label: 'Retreats: Tulum, Jan 27–31, 2027', href: 'https://www.vortexretreats.com/creator-consciousness/', external: true, note: 'Creator Immersion Retreat · opens the retreat site' },
         { label: '1:1 Coaching', href: '/offerings#coaching' },
         { label: 'Breathwork & Sound', href: '/offerings#breathwork' },
-        { label: 'Brand Deals e-book', href: '/offerings#ebook' },
+        { label: 'How to Get Brand Deals', href: '/offerings#ebook', note: 'Coming soon' },
         { label: 'Shop', href: '/offerings#shop' },
         { label: 'All offerings', href: '/offerings' },
       ]
