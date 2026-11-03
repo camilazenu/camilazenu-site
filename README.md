@@ -6,9 +6,10 @@ Camila Zenu's website: Creator Consciousness, Creator Academy, Events and Offeri
 - Owner: Camila Zenu (`camilazenu`). Collaborator: WvH Hospitality (`wvhhospitality`).
 
 ## Working on the site (both of us)
+See `CLAUDE.md` for branches and the file map.
 1. **Pull first:** `git pull` before you edit, every time.
-2. Make your change and check it in a preview (push a branch to get a Netlify preview link).
-3. **Push when done:** merge/push to `main` and Netlify publishes in about a minute.
+2. Work on your own branch (never `main`), push it, and check the Netlify preview link on its pull request.
+3. When it's approved, merge the pull request. Only a merge into `main` reaches the public site.
 
 Never put API keys or passwords in this repo; they live in Netlify's environment variables.
 

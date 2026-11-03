@@ -1,0 +1,19 @@
+{
+  "name": "camilazenu-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "vendor": "esbuild scripts/vendor-identity.js --bundle --format=esm --minify --outfile=assets/vendor/identity.js && esbuild scripts/vendor-tus.js --bundle --format=esm --minify --outfile=assets/vendor/tus.js"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.7",
+    "@netlify/functions": "^6.0.3",
+    "@netlify/identity": "^2.0.0",
+    "stripe": "^23.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "tus-js-client": "^4.3.1"
+  }
+}
