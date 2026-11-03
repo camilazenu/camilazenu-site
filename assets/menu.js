@@ -14,6 +14,8 @@
     { label: 'Events', href: '/events' },
     { label: 'Creator Consciousness', href: '/creator-consciousness' },
     { label: 'Creator Academy', href: '/creator-academy', tag: 'New' },
+    { label: 'She’s Cultured', href: 'https://shescultured.com', external: true, tag: 'Podcast', note: 'New episodes every Thursday · with Tiffany Kerr' },
+    { label: 'Substack', href: 'https://sanctuaryofthewild.substack.com/', external: true, note: 'Writing from the in between' },
     {
       label: 'Offerings', children: [
         { label: 'Retreats: Tulum, Jan 27–31, 2027', href: 'https://www.vortexretreats.com/creator-consciousness/', external: true, note: 'Creator Immersion Retreat · opens the retreat site' },
@@ -25,7 +27,7 @@
       ]
     },
     { label: 'About', href: '/about' },
-    { label: 'Links', href: '/links' },
+    { label: 'Camila’s favorites', href: '/links' },
   ];
 
   function item(i) {
@@ -35,7 +37,8 @@
       return `<li><details><summary>${i.label}</summary><ul class="menu-sub">${subs}</ul></details></li>`;
     }
     if (i.book) return `<li><a href="${i.href}" data-book class="menu-book">${i.label} <span class="menu-tag">Free</span></a></li>`;
-    return `<li><a href="${i.href}">${i.label}${i.tag ? `<span class="menu-tag">${i.tag}</span>` : ''}</a></li>`;
+    const ext = i.external ? ' target="_blank" rel="noopener"' : '';
+    return `<li><a href="${i.href}"${ext}>${i.label}${i.external ? ' ↗' : ''}${i.tag ? `<span class="menu-tag">${i.tag}</span>` : ''}${i.note ? `<small>${i.note}</small>` : ''}</a></li>`;
   }
 
   const drawer = document.createElement('div');

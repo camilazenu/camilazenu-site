@@ -50,6 +50,7 @@ body.menu-open { overflow: hidden; }
 .menu-sub { list-style: none; padding: 0 0 .7rem .9rem; margin: 0; }
 .menu-sub a { font-family: 'Lora', serif; font-size: 1.02rem; padding: .45rem 0; }
 .menu-sub small { display: block; font-family: 'Inter', sans-serif; font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: -.2rem; }
+.menu-list > li > a small { display: block; font-family: 'Inter', sans-serif; font-size: .72rem; letter-spacing: .04em; opacity: .7; margin-top: .1rem; }
 .menu-tag {
   font-family: 'Inter', sans-serif; font-size: .62rem; font-weight: 600; letter-spacing: .12em;
   text-transform: uppercase; background: var(--saffron, #C29030); color: #fff;
