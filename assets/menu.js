@@ -1,8 +1,7 @@
 // Site menu: one place to edit the navigation for every page.
 // Edit MENU below to add, remove or rename items.
 (function () {
-  const BOOK_URL = 'https://calendly.com/camilazenu/creator-consciousness-discovery-call';
-  const NEWSLETTER_EMBED = 'https://sanctuaryofthewild.substack.com/embed';
+  const BOOK_URL = 'https://calendly.com/camilazenu/new-meeting-1'; // Free 1:1 discovery call
   // Account emails (confirm, reset password, invite) land on the homepage with a token in the URL hash.
   // Hand them to the Academy login page, which finishes the flow.
   if (/(confirmation|recovery|invite|email_change)_token=/.test(location.hash) && location.pathname !== '/academy/login') {
@@ -48,7 +47,7 @@
       <div class="menu-brand">Camila Zenu</div>
       <ul class="menu-list">${MENU.map(item).join('')}</ul>
       <div class="menu-foot">
-        <a href="${NEWSLETTER_EMBED.replace('/embed', '')}" target="_blank" rel="noopener">Newsletter: Writing from the in between</a><br>
+        <a href="#newsletter" data-newsletter>Join Camila's newsletter</a><br>
         <a href="https://www.instagram.com/camilazenu" target="_blank" rel="noopener">Instagram</a> ·
         <a href="https://www.tiktok.com/@camilazenu" target="_blank" rel="noopener">TikTok</a> ·
         <a href="mailto:camila@camilazenu.com">Email</a>
@@ -115,32 +114,74 @@
     loadCalendly().then((C) => C.initPopupWidget({ url })).catch(() => window.open(url, '_blank', 'noopener'));
   });
 
-  // ── Newsletter invite: appears once after a few seconds, then stays quiet ──
+  // ── Newsletter invite: her own form, saved to the CZ Leads board in Monday (which syncs to Kit) ──
   const NL_KEY = 'cz_newsletter';
   const remember = (days) => { try { localStorage.setItem(NL_KEY, String(Date.now() + days * 864e5)); } catch {} };
   const snoozed = () => { try { return Number(localStorage.getItem(NL_KEY) || 0) > Date.now(); } catch { return true; } };
+
+  function openNewsletter() {
+    if (document.querySelector('.nl-root')) return;
+    const nl = document.createElement('div');
+    nl.className = 'nl-root';
+    nl.innerHTML = `
+      <div class="nl-overlay" data-nl-close></div>
+      <div class="nl-card" role="dialog" aria-modal="true" aria-labelledby="nl-title">
+        <button class="nl-x" type="button" aria-label="Close" data-nl-close>&times;</button>
+        <div class="nl-kicker">Camila's letters</div>
+        <h2 id="nl-title">Writing from the <em>in between</em></h2>
+        <p>Stories of healing, breaking, becoming, and remembering who we are. Plus first word on new cohorts, retreats, and live calls.</p>
+        <form class="nl-form" novalidate>
+          <input type="text" name="name" placeholder="First name" autocomplete="given-name" aria-label="First name" />
+          <input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Email" required />
+          <input type="text" name="company" tabindex="-1" autocomplete="off" class="nl-hp" aria-hidden="true" />
+          <button type="submit">Join the list</button>
+          <p class="nl-msg" role="status" hidden></p>
+        </form>
+        <button class="nl-no" type="button" data-nl-close data-nl-days="14">Maybe later</button>
+        <button class="nl-no" type="button" data-nl-close data-nl-days="365">I'm already on the list</button>
+      </div>`;
+    document.body.appendChild(nl);
+    requestAnimationFrame(() => nl.classList.add('on'));
+    const shut = (days) => { remember(days); nl.classList.remove('on'); setTimeout(() => nl.remove(), 300); };
+    nl.querySelectorAll('[data-nl-close]').forEach((el) => el.addEventListener('click', () => shut(Number(el.dataset.nlDays || 14))));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nl.isConnected) shut(14); });
+
+    const form = nl.querySelector('.nl-form');
+    const msg = nl.querySelector('.nl-msg');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const email = String(f.get('email') || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = 'Please enter a valid email.'; msg.hidden = false; return; }
+      const btn = form.querySelector('button');
+      btn.disabled = true; btn.textContent = 'One moment…';
+      try {
+        const res = await fetch('/api/newsletter', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: f.get('name'), email, company: f.get('company'), page: location.pathname }),
+        });
+        if (!res.ok) throw new Error();
+        remember(365);
+        form.innerHTML = '<p class="nl-done">You’re on the list ✦ Welcome to the in between.</p>';
+        setTimeout(() => shut(365), 2600);
+      } catch {
+        btn.disabled = false; btn.textContent = 'Join the list';
+        msg.textContent = 'Something went wrong. Please try again in a moment.'; msg.hidden = false;
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-newsletter]');
+    if (!a) return;
+    e.preventDefault(); close(); openNewsletter();
+  });
+
   const skip = location.pathname.startsWith('/academy') || /(enrolled|welcome)=/.test(location.search);
   if (!skip && !snoozed()) {
     setTimeout(() => {
       if (document.body.classList.contains('menu-open') || document.querySelector('.calendly-overlay')) return;
-      const nl = document.createElement('div');
-      nl.className = 'nl-root';
-      nl.innerHTML = `
-        <div class="nl-overlay" data-nl-close></div>
-        <div class="nl-card" role="dialog" aria-modal="true" aria-labelledby="nl-title">
-          <button class="nl-x" type="button" aria-label="Close" data-nl-close>&times;</button>
-          <div class="nl-kicker">Camila's letters</div>
-          <h2 id="nl-title">Writing from the <em>in between</em></h2>
-          <p>Stories of healing, breaking, becoming and remembering who we are. Plus first word on new cohorts, retreats and live calls.</p>
-          <iframe src="${NEWSLETTER_EMBED}" title="Subscribe to Camila's newsletter" loading="lazy" scrolling="no"></iframe>
-          <button class="nl-no" type="button" data-nl-close data-nl-days="14">Maybe later</button>
-          <button class="nl-no" type="button" data-nl-close data-nl-days="365">I'm already subscribed</button>
-        </div>`;
-      document.body.appendChild(nl);
-      requestAnimationFrame(() => nl.classList.add('on'));
-      const shut = (days) => { remember(days); nl.classList.remove('on'); setTimeout(() => nl.remove(), 300); };
-      nl.querySelectorAll('[data-nl-close]').forEach((el) => el.addEventListener('click', () => shut(Number(el.dataset.nlDays || 14))));
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && nl.isConnected) shut(14); });
+      openNewsletter();
     }, 6000);
   }
 })();

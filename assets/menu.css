@@ -82,5 +82,12 @@ body.menu-open { overflow: hidden; }
 .nl-card h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 2rem; line-height: 1.1; margin: .4rem 0 .6rem; color: var(--forest, #1A2A1F); }
 .nl-card h2 em { color: var(--saffron, #C29030); }
 .nl-card p { font-family: 'Lora', serif; font-size: .98rem; line-height: 1.6; margin: 0 0 1rem; }
-.nl-card iframe { width: 100%; height: 150px; border: 1px solid rgba(184,152,90,.3); border-radius: 6px; background: #fff; }
+.nl-form { display: grid; gap: .55rem; }
+.nl-form input { font: 400 1rem 'Lora', serif; padding: .75rem .85rem; border: 1px solid rgba(184,152,90,.55); border-radius: 5px; background: #fffdf7; color: var(--forest, #1A2A1F); width: 100%; }
+.nl-form input:focus { outline: 2px solid var(--saffron, #C29030); outline-offset: 1px; }
+.nl-form button { font-family: 'Inter', sans-serif; font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: .9rem 1rem; border: 0; border-radius: 5px; background: var(--forest, #1A2A1F); color: var(--linen, #F5EBDC); cursor: pointer; }
+.nl-form button[disabled] { opacity: .65; cursor: progress; }
+.nl-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+.nl-msg { font-family: 'Inter', sans-serif; font-size: .78rem; color: #7a2323; margin: 0; }
+.nl-done { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--forest, #1A2A1F); margin: .6rem 0; }
 .nl-no { background: none; border: 0; cursor: pointer; font-family: 'Inter', sans-serif; font-size: .74rem; color: var(--henna, #6B2F1E); text-decoration: underline; margin: .7rem .5rem 0; }
