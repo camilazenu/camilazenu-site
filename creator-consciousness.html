@@ -975,6 +975,9 @@
 
     /* Long Book a Call label: drop the wordmark on phones so it fits */
     @media (max-width: 640px) { .nav-logo { display: none; } }
+    /* Waitlist: enrollment is closed while the cohort runs. Remove this rule to bring the price cards and checkout buttons back. */
+    .pricing-grid { display: none; }
+    #pricing .secure-note { text-align: left; }
   </style>
   <link rel="stylesheet" href="/assets/menu.css" />
 </head>
@@ -1005,12 +1008,12 @@
     </h1>
     <p class="hero-sub">A 30-Day Initiation, From Consumer to Creator</p>
     <div class="hero-badges">
-      <span>Starts Wednesday, October 28, 2026</span>
-      <span>Limited Spots Available</span>
+      <span>Current cohort in session</span>
+      <span>Waitlist open</span>
       <span>Live Group Coaching</span>
     </div>
     <div class="hero-actions">
-      <a href="#pricing" class="btn-primary">Claim Your Spot</a>
+      <a href="https://forms.monday.com/forms/52b9b20dbcde014325a84c0507324842?r=use1" target="_blank" rel="noopener" class="btn-primary">Join the Waitlist</a>
       <a href="#video" class="btn-outline">Watch the Video</a>
     </div>
     <p class="hero-note">30 days &middot; Live calls &middot; Private community &middot; Lifetime replays</p>
@@ -1309,9 +1312,10 @@
   <!-- ── Pricing ──────────────────────────────────────────────────── -->
   <section id="pricing">
     <div class="section-wide">
-      <div class="section-label reveal">Investment</div>
-      <h2 class="section-title reveal reveal-delay-1">Choose Your Path</h2>
-      <p class="section-subtitle reveal reveal-delay-2">Your investment in your voice is an investment in your legacy.</p>
+      <div class="section-label reveal">Waitlist</div>
+      <h2 class="section-title reveal reveal-delay-1">The Current Cohort Is in Session</h2>
+      <p class="section-subtitle reveal reveal-delay-2">Join the waitlist and you'll be the first to hear when the next one opens.</p>
+      <a href="https://forms.monday.com/forms/52b9b20dbcde014325a84c0507324842?r=use1" target="_blank" rel="noopener" class="btn-primary reveal reveal-delay-3">Join the Waitlist</a>
 
       <div class="pricing-grid">
         <!-- Option 1: Paid in Full ($888) -->
@@ -1334,7 +1338,7 @@
       </div>
 
       <p id="cc-msg" class="secure-note" hidden></p>
-      <p class="secure-note reveal">Secure checkout via Stripe &middot; All major cards accepted &middot; Questions? <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
+      <p class="secure-note reveal">Questions? <a href="mailto:camila@camilazenu.com">camila@camilazenu.com</a></p>
     </div>
   </section>
 
@@ -1349,9 +1353,9 @@
       <p class="final-quote reveal">&ldquo;Your story is not a mistake.<br>It is the portal.&rdquo;</p>
       <p class="final-attribution reveal reveal-delay-1">Camila Zenu</p>
       <p class="final-body reveal reveal-delay-2">The world is waiting for your voice. Not the polished, perfect, fully-figured-out version. The real one. The one that trembles and shines and sounds exactly like you.</p>
-      <p class="final-sub reveal reveal-delay-3">Starts October 28, 2026 &middot; Limited to 30 women</p>
-      <a href="#pricing" class="btn-primary reveal reveal-delay-4" style="font-size:.95rem;padding:1rem 2.5rem;">Yes, I'm Ready to Begin</a>
-      <p class="final-cta-note reveal">Secure enrollment &middot; Questions welcome &middot; You belong here</p>
+      <p class="final-sub reveal reveal-delay-3">The current cohort is in session &middot; Be first to hear about the next one</p>
+      <a href="https://forms.monday.com/forms/52b9b20dbcde014325a84c0507324842?r=use1" target="_blank" rel="noopener" class="btn-primary reveal reveal-delay-4" style="font-size:.95rem;padding:1rem 2.5rem;">Join the Waitlist</a>
+      <p class="final-cta-note reveal">Questions welcome &middot; You belong here</p>
     </div>
   </section>
 
