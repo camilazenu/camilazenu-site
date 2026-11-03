@@ -59,7 +59,28 @@ body.menu-open { overflow: hidden; }
 .menu-foot a { color: var(--henna, #6B2F1E); }
 @media (max-width: 640px) {
   .nav-right .nav-link { display: none; }
-  .nav-right .nav-cta { display: none; }
+  .nav-right .nav-cta { padding: .45rem .8rem; font-size: .64rem; letter-spacing: .1em; white-space: nowrap; }
   .nav-inner { padding: .8rem 1.1rem; }
   .nav-logo { white-space: nowrap; font-size: .98rem; }
 }
+
+/* Book a call */
+.menu-list a.menu-book { color: var(--henna, #6B2F1E); }
+
+/* Newsletter invite */
+.nl-root { position: fixed; inset: 0; z-index: 4000; display: grid; place-items: center; padding: 1.2rem; opacity: 0; transition: opacity .3s ease; }
+.nl-root.on { opacity: 1; }
+.nl-overlay { position: absolute; inset: 0; background: rgba(26, 42, 31, .5); }
+.nl-card {
+  position: relative; width: min(460px, 100%); background: var(--linen-soft, #FAF1E2); color: var(--ink, #3A1F12);
+  border: 1px solid rgba(184,152,90,.45); border-radius: 8px; padding: 2rem 1.8rem 1.2rem; text-align: center;
+  box-shadow: 0 24px 60px rgba(26,42,31,.3); transform: translateY(12px); transition: transform .3s ease;
+}
+.nl-root.on .nl-card { transform: none; }
+.nl-x { position: absolute; top: .6rem; right: .8rem; background: none; border: 0; font-size: 1.6rem; line-height: 1; cursor: pointer; color: inherit; }
+.nl-kicker { font-family: 'Inter', sans-serif; font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--moss, #5C6B4A); }
+.nl-card h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 2rem; line-height: 1.1; margin: .4rem 0 .6rem; color: var(--forest, #1A2A1F); }
+.nl-card h2 em { color: var(--saffron, #C29030); }
+.nl-card p { font-family: 'Lora', serif; font-size: .98rem; line-height: 1.6; margin: 0 0 1rem; }
+.nl-card iframe { width: 100%; height: 150px; border: 1px solid rgba(184,152,90,.3); border-radius: 6px; background: #fff; }
+.nl-no { background: none; border: 0; cursor: pointer; font-family: 'Inter', sans-serif; font-size: .74rem; color: var(--henna, #6B2F1E); text-decoration: underline; margin: .7rem .5rem 0; }

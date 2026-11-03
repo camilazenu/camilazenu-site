@@ -2,7 +2,7 @@
 import type { Context } from "@netlify/functions"
 import {
   cloudflare, currentUser, fail, getPosts, getReplays, getSettings, isAdmin, json, newId,
-  removeComp, saveReplays, savePosts, saveSettings, setComp, store, accessFor, type MemberRecord, type Settings,
+  removeComp, saveReplays, savePosts, saveSettings, setComp, store, accessFor, addAlumni, removeAlumni, type MemberRecord, type Settings,
 } from "../lib/academy.mts"
 
 const str = (v: unknown, max = 2000) => String(v ?? "").trim().slice(0, max)
@@ -22,14 +22,16 @@ export default async (req: Request, context: Context) => {
       ).filter(Boolean) as MemberRecord[]
       const { blobs: compBlobs } = await s.list({ prefix: "comps/" })
       const comps = await Promise.all(compBlobs.map((x) => s.get(x.key, { type: "json" })))
+      const { blobs: alumniBlobs } = await s.list({ prefix: "ccalumni/" })
+      const alumni = await Promise.all(alumniBlobs.map((x) => s.get(x.key, { type: "json" })))
       const roster = await Promise.all(
         members.map(async (m) => ({
           email: m.email, name: m.name, status: m.status ?? "none", plan: m.plan ?? null,
           periodEnd: m.periodEnd ?? null, cancelAtPeriodEnd: !!m.cancelAtPeriodEnd,
-          foundersRsvp: !!m.foundersRsvp, member: (await accessFor(context, m)).member,
+          foundersRsvp: !!m.foundersRsvp, ...(({ member, cc }) => ({ member, cc }))(await accessFor(context, m)),
         })),
       )
-      return json({ settings: await getSettings(context), replays: await getReplays(context), posts: await getPosts(context), roster, comps })
+      return json({ settings: await getSettings(context), replays: await getReplays(context), posts: await getPosts(context), roster, comps, alumni })
     }
 
     case "saveSettings": {
@@ -46,7 +48,7 @@ export default async (req: Request, context: Context) => {
       const title = str(b.title, 200), body = str(b.body, 8000)
       if (!title) return fail("Give it a title.", 400)
       const posts = await getPosts(context)
-      posts.push({ id: newId(), kind: b.kind === "prompt" ? "prompt" : "post", title, body, createdAt: Date.now(), comments: [] })
+      posts.push({ id: newId(), kind: b.kind === "prompt" || b.kind === "resource" ? b.kind : "post", title, body, createdAt: Date.now(), comments: [] })
       await savePosts(context, posts)
       return json({ ok: true })
     }
@@ -82,7 +84,7 @@ export default async (req: Request, context: Context) => {
       if (!/^[a-f0-9]{32}$/i.test(uid)) return fail("That video ID doesn't look right.", 400)
       if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("Add a title and a date.", 400)
       const replays = (await getReplays(context)).filter((r) => r.uid !== uid)
-      replays.push({ uid, title, date, note: str(b.note, 1000) })
+      replays.push({ uid, title, date, note: str(b.note, 1000), program: b.program === "cc" ? "cc" : "academy" })
       await saveReplays(context, replays)
       return json({ ok: true })
     }
@@ -97,6 +99,18 @@ export default async (req: Request, context: Context) => {
       const email = str(b.email, 200).toLowerCase(), until = str(b.until, 10)
       if (!/^\S+@\S+\.\S+$/.test(email) || !/^\d{4}-\d{2}-\d{2}$/.test(until)) return fail("Add an email and an end date.", 400)
       await setComp(context, { email, until, note: str(b.note, 200) })
+      return json({ ok: true })
+    }
+
+    case "addAlumni": {
+      const emails = String(b.emails ?? "").split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter((e) => /^\S+@\S+\.\S+$/.test(e))
+      if (!emails.length) return fail("Add at least one email.", 400)
+      for (const email of emails) await addAlumni(context, { email, source: "admin", cohort: str(b.cohort, 80) || undefined })
+      return json({ ok: true, added: emails.length })
+    }
+
+    case "removeAlumni": {
+      await removeAlumni(context, str(b.email, 200))
       return json({ ok: true })
     }
 

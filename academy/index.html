@@ -62,7 +62,7 @@
     }
 
     // ── Not a member yet ──────────────────────────────────────────
-    function renderJoin(me, content) {
+    function renderJoin(me, content, target = app) {
       const opens = fmtDate(me.opensAt, { weekday: 'long', month: 'long', day: 'numeric' });
       let status = '';
       if (me.status === 'past_due' || me.status === 'unpaid')
@@ -70,13 +70,12 @@
       else if (me.status === 'canceled')
         status = `<div class="notice notice-info">Your membership has ended. We’d love to have you back whenever you’re ready.</div>`;
 
-      const trial = me.trialAvailable;
       const join = me.open
         ? `<div class="price-row">
              <div class="card feature"><span class="badge">Most flexible</span><div class="kicker">Monthly</div>
                <div class="price-big">$88 <span>/ month</span></div>
-               <p>${trial ? 'Start with 7 days free. ' : ''}Cancel anytime from your account.</p>
-               <div class="actions"><button class="btn-primary" data-plan="monthly">${trial ? 'Start 7-day free trial' : 'Join monthly'}</button></div></div>
+               <p>Cancel anytime from your account.</p>
+               <div class="actions"><button class="btn-primary" data-plan="monthly">Join monthly</button></div></div>
              <div class="card"><div class="kicker">Yearly</div>
                <div class="price-big">$880 <span>/ year</span></div>
                <p>Two months free. One payment, a full year.</p>
@@ -92,7 +91,8 @@
           : `<p>A real teaching you can use that night, plus the founding-member offer, shared only on this call.</p><div class="actions"><button class="btn-primary" id="rsvp">Save my spot (free)</button></div>`}
       </div>`;
 
-      app.innerHTML = `<div class="ac-section">${status}<h2>Join the Academy</h2>${join}<h2>Founders Call</h2>${founders}</div>`;
+      target.innerHTML = `${status}<h2>Join the Academy</h2>${join}<h2>Founders Call</h2>${founders}`;
+      if (target === app) app.innerHTML = `<div class="ac-section">${app.innerHTML}</div>`;
       app.querySelectorAll('[data-plan]').forEach((b) => (b.onclick = () => busy(b, () => startCheckout(b.dataset.plan).catch(fail))));
       app.querySelectorAll('[data-portal]').forEach((b) => (b.onclick = () => busy(b, openPortal)));
       const r = document.getElementById('rsvp');
@@ -104,15 +104,43 @@
     }
 
     // ── Members area ──────────────────────────────────────────────
-    const TABS = [['call', 'This week'], ['feed', 'Prompts & community'], ['replays', 'Replays'], ['account', 'Account']];
+    let TABS = [];
+
+    const replayList = (list, empty) => list.length
+      ? `<div class="replay-list">${list.map((r) => `
+          <div class="card"><div class="replay"><div><div class="kicker">${esc(fmtDate(r.date))}</div><h3>${esc(r.title)}</h3>${r.note ? `<p>${rich(r.note)}</p>` : ''}</div>
+            <button class="btn-outline" data-play="${esc(r.uid)}">Watch</button></div><div class="player-slot"></div></div>`).join('')}</div>`
+      : `<p class="muted">${empty}</p>`;
 
     function renderMember(me, c) {
+      TABS = [
+        ...(c.academy ? [['call', 'This week'], ['feed', 'Prompts & resources'], ['replays', 'Academy replays']] : []),
+        ...(c.cc ? [['cc', 'Creator Consciousness']] : []),
+        ...(!c.academy ? [['join', 'Join the Academy']] : []),
+        ['account', 'Account'],
+      ];
       app.innerHTML = `
         <nav class="ac-tabs">${TABS.map(([id, label]) => `<a href="#${id}" data-tab="${id}">${label}</a>`).join('')}</nav>
-        <section class="ac-section" id="tab-call"></section>
-        <section class="ac-section" id="tab-feed"></section>
-        <section class="ac-section" id="tab-replays"></section>
-        <section class="ac-section" id="tab-account"></section>`;
+        ${TABS.map(([id]) => `<section class="ac-section" id="tab-${id}"></section>`).join('')}`;
+
+      if (c.cc) document.getElementById('tab-cc').innerHTML =
+        `<h2>Creator Consciousness library</h2><p>Recordings from the program, for everyone who has been through it.</p>${replayList(c.ccReplays, 'Program recordings will appear here.')}`;
+      if (!c.academy) renderJoin(me, c, document.getElementById('tab-join'));
+      if (c.academy) renderAcademy(me, c);
+      renderAccount(me);
+      wirePlayers();
+
+      // Tabs
+      const select = (id) => {
+        if (!TABS.some(([t]) => t === id)) id = TABS[0][0];
+        TABS.forEach(([t]) => (document.getElementById(`tab-${t}`).hidden = t !== id));
+        app.querySelectorAll('.ac-tabs a').forEach((a) => a.classList.toggle('on', a.dataset.tab === id));
+      };
+      app.querySelectorAll('[data-tab]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); history.replaceState(null, '', `#${a.dataset.tab}`); select(a.dataset.tab); scrollTo({ top: 0, behavior: 'smooth' }); }));
+      select(currentTab || location.hash.slice(1));
+    }
+
+    function renderAcademy(me, c) {
 
       // This week
       const latestPrompt = c.posts.find((p) => p.kind === 'prompt');
@@ -130,7 +158,7 @@
       document.getElementById('tab-feed').innerHTML = c.posts.length
         ? c.posts.map((p) => `
           <article class="card post" data-post="${esc(p.id)}">
-            <div class="kicker">${p.kind === 'prompt' ? 'Prompt' : 'From Camila'} · ${esc(fmtDate(p.createdAt))}</div>
+            <div class="kicker">${p.kind === 'prompt' ? 'Prompt' : p.kind === 'resource' ? 'Resource' : 'From Camila'} · ${esc(fmtDate(p.createdAt))}</div>
             <h3>${esc(p.title)}</h3>
             ${p.body ? `<div class="post-body">${rich(p.body)}</div>` : ''}
             <div class="comments">
@@ -155,11 +183,10 @@
       });
 
       // Replays
-      document.getElementById('tab-replays').innerHTML = c.replays.length
-        ? `<div class="replay-list">${c.replays.map((r) => `
-            <div class="card"><div class="replay"><div><div class="kicker">${esc(fmtDate(r.date))}</div><h3>${esc(r.title)}</h3>${r.note ? `<p>${rich(r.note)}</p>` : ''}</div>
-              <button class="btn-outline" data-play="${esc(r.uid)}">Watch</button></div><div class="player-slot"></div></div>`).join('')}</div>`
-        : '<p class="muted">Replays of each weekly call will appear here.</p>';
+      document.getElementById('tab-replays').innerHTML = `<h2>Academy replays</h2>${replayList(c.replays, 'Replays of each weekly call will appear here.')}`;
+    }
+
+    function wirePlayers() {
       app.querySelectorAll('[data-play]').forEach((b) => (b.onclick = () => busy(b, async () => {
         try {
           const { src } = await api(`/api/academy/replay?uid=${encodeURIComponent(b.dataset.play)}`);
@@ -168,32 +195,25 @@
           b.remove();
         } catch (e) { fail(e); }
       })));
+    }
 
-      // Account
+    function renderAccount(me) {
       const plan = me.plan === 'yearly' ? '$880 / year' : me.plan === 'monthly' ? '$88 / month' : '—';
-      const statusText = { trialing: 'Free trial', active: 'Active', past_due: 'Payment issue', canceled: 'Canceled', none: me.comp ? 'Complimentary' : '—' }[me.status] || me.status;
+      const statusText = { trialing: 'Active', active: 'Active', past_due: 'Payment issue', canceled: 'Canceled', none: me.comp ? 'Complimentary' : '—' }[me.status] || me.status;
       document.getElementById('tab-account').innerHTML = `
         <div class="card"><div class="kicker">Your membership</div>
           <dl class="kv">
             <dt>Status</dt><dd>${esc(statusText)}</dd>
             ${me.paid ? `<dt>Plan</dt><dd>${esc(plan)}</dd>` : ''}
-            ${me.paid && me.periodEnd ? `<dt>${me.cancelAtPeriodEnd ? 'Access until' : me.status === 'trialing' ? 'Trial ends' : 'Renews'}</dt><dd>${esc(fmtDate(me.periodEnd))}</dd>` : ''}
+            ${me.cc ? '<dt>Creator Consciousness</dt><dd>Alumni library unlocked</dd>' : ''}
+            ${me.paid && me.periodEnd ? `<dt>${me.cancelAtPeriodEnd ? 'Access until' : 'Renews'}</dt><dd>${esc(fmtDate(me.periodEnd))}</dd>` : ''}
             ${me.comp ? `<dt>Included access</dt><dd>Through ${esc(fmtDate(me.comp.until))}</dd>` : ''}
             <dt>Email</dt><dd>${esc(me.email)}</dd>
           </dl>
           <div class="actions">${me.hasBilling ? '<button class="btn-outline" data-portal>Manage billing, plan or cancel</button>' : ''}</div>
           ${me.comp && !me.paid ? '<p class="fine">Your access is included for now. Choose a plan any time before it ends to keep your spot.</p>' : ''}
         </div>`;
-      app.querySelectorAll('[data-portal]').forEach((b) => (b.onclick = () => busy(b, openPortal)));
-
-      // Tabs
-      const select = (id) => {
-        if (!TABS.some(([t]) => t === id)) id = 'call';
-        TABS.forEach(([t]) => (document.getElementById(`tab-${t}`).hidden = t !== id));
-        app.querySelectorAll('.ac-tabs a').forEach((a) => a.classList.toggle('on', a.dataset.tab === id));
-      };
-      app.querySelectorAll('[data-tab]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); history.replaceState(null, '', `#${a.dataset.tab}`); select(a.dataset.tab); scrollTo({ top: 0, behavior: 'smooth' }); }));
-      select(currentTab || location.hash.slice(1));
+      app.querySelectorAll('#tab-account [data-portal]').forEach((b) => (b.onclick = () => busy(b, openPortal)));
     }
 
     let currentTab = null;
@@ -205,7 +225,7 @@
         header(me);
 
         const next = params.get('next');
-        if (next?.startsWith('checkout-') && !me.member) {
+        if (next?.startsWith('checkout-') && !me.member && !me.admin) {
           history.replaceState(null, '', '/academy/');
           params.delete('next');
           if (me.open) { notice(msg, 'Taking you to checkout…', 'info'); return startCheckout(next.replace('checkout-', '')).catch(fail); }
@@ -217,7 +237,7 @@
         }
 
         const content = await api('/api/academy/content');
-        if (me.member || me.admin) renderMember(me, content);
+        if (content.academy || content.cc) renderMember(me, content);
         else renderJoin(me, content);
       } catch (e) {
         app.innerHTML = '';

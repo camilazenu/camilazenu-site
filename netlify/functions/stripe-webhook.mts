@@ -2,7 +2,7 @@
 // Grants or removes Creator Academy access and closes the Creator Consciousness 2-pay plan after payment 2.
 import type { Context } from "@netlify/functions"
 import type Stripe from "stripe"
-import { accessFor, getRecordById, saveRecord, stripe, syncRole, userIdForCustomer, type MemberRecord } from "../lib/academy.mts"
+import { accessFor, addAlumni, getRecordById, saveRecord, stripe, syncRole, userIdForCustomer, type MemberRecord } from "../lib/academy.mts"
 
 export default async (req: Request, context: Context) => {
   const secret = Netlify.env.get("STRIPE_WEBHOOK_SECRET")?.trim()
@@ -23,6 +23,11 @@ export default async (req: Request, context: Context) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session
         const subId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id
+        if (session.metadata?.offer === "creator-consciousness") {
+          // Enrolling unlocks the CC video library for the email they paid with.
+          const email = session.customer_details?.email ?? session.customer_email
+          if (email) await addAlumni(context, { email, source: "stripe", cohort: session.metadata?.cohort })
+        }
         if (session.metadata?.offer === "creator-consciousness" && session.metadata?.plan === "installment" && subId) {
           await endAfterTwoPayments(s, subId)
         }
@@ -72,7 +77,6 @@ async function applySubscription(context: Context, sub: Stripe.Subscription, use
   rec.plan = (sub.metadata?.plan as MemberRecord["plan"]) ?? rec.plan
   rec.periodEnd = item?.current_period_end ?? (sub as unknown as { current_period_end?: number }).current_period_end
   rec.cancelAtPeriodEnd = !!sub.cancel_at_period_end || !!sub.cancel_at
-  if (sub.trial_start) rec.trialUsed = true
   if (!rec.email) {
     const customer = await stripe().customers.retrieve(customerId)
     if (!("deleted" in customer && customer.deleted)) rec.email = (customer as Stripe.Customer).email ?? ""

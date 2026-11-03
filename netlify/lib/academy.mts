@@ -57,6 +57,7 @@ export interface Comp {
 const userKey = (id: string) => `users/${id}`
 const customerKey = (id: string) => `customers/${id}`
 const compKey = (email: string) => `comps/${email.trim().toLowerCase()}`
+const alumniKey = (email: string) => `ccalumni/${email.trim().toLowerCase()}`
 
 export async function getRecord(context: Context, user: Pick<User, "id" | "email" | "name">) {
   const s = store(context)
@@ -93,15 +94,44 @@ export async function removeComp(context: Context, email: string) {
   await store(context).delete(compKey(email))
 }
 
+export interface Alumni {
+  email: string
+  cohort?: string
+  addedAt: number
+  source: "stripe" | "admin"
+}
+
+export async function getAlumni(context: Context, email?: string) {
+  if (!email) return null
+  return (await store(context).get(alumniKey(email), { type: "json" })) as Alumni | null
+}
+
+export async function addAlumni(context: Context, a: Omit<Alumni, "addedAt"> & { addedAt?: number }) {
+  const existing = await getAlumni(context, a.email)
+  await store(context).setJSON(alumniKey(a.email), {
+    ...existing, ...a, email: a.email.trim().toLowerCase(), addedAt: existing?.addedAt ?? a.addedAt ?? Date.now(),
+  })
+}
+
+export async function removeAlumni(context: Context, email: string) {
+  await store(context).delete(alumniKey(email))
+}
+
 const compActive = (comp: Comp | null) =>
   !!comp && Date.parse(`${comp.until}T23:59:59-08:00`) >= Date.now()
 
-/** Paid (active/trialing) or complimentary access. Past-due and canceled lose access. */
+/** Two gates:
+ *  member — Creator Academy (paid, or complimentary until a date). Past-due and canceled lose it.
+ *  cc     — Creator Consciousness alumni: unlocks the CC video library, for good. */
 export async function accessFor(context: Context, rec: MemberRecord) {
   const paid = rec.status === "active" || rec.status === "trialing"
-  const comp = await getComp(context, rec.email)
-  return { member: paid || compActive(comp), paid, comp: compActive(comp) ? comp : null }
+  const [comp, alumni] = await Promise.all([getComp(context, rec.email), getAlumni(context, rec.email)])
+  return { member: paid || compActive(comp), paid, comp: compActive(comp) ? comp : null, cc: !!alumni }
 }
+
+/** Which libraries a user may watch. Admins see everything. */
+export const canWatch = (program: Program, a: { member: boolean; cc: boolean }, admin: boolean) =>
+  admin || (program === "cc" ? a.cc : a.member)
 
 // ── Auth ─────────────────────────────────────────────────────────
 
@@ -149,8 +179,11 @@ export interface Settings {
   welcome?: string
 }
 
+export type Program = "academy" | "cc"
+
 export interface Replay {
   uid: string
+  program?: Program // missing = academy
   title: string
   date: string // YYYY-MM-DD
   note?: string
@@ -166,7 +199,7 @@ export interface Comment {
 
 export interface Post {
   id: string
-  kind: "prompt" | "post"
+  kind: "prompt" | "post" | "resource"
   title: string
   body: string
   createdAt: number

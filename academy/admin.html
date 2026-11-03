@@ -74,7 +74,7 @@
 
         <h2>Post a prompt or update</h2>
         <form class="card ac-form" id="post">
-          <label>Type <select name="kind"><option value="prompt">Weekly prompt</option><option value="post">Update from Camila</option></select></label>
+          <label>Type <select name="kind"><option value="prompt">Weekly prompt</option><option value="resource">Resource</option><option value="post">Update from Camila</option></select></label>
           <label>Title <input name="title" required /></label>
           <label>Message <textarea name="body"></textarea></label>
           <button class="btn-primary" type="submit">Publish to members</button>
@@ -87,6 +87,7 @@
         <form class="card ac-form" id="upload">
           <p>Upload the call recording here. It goes straight to your private Cloudflare video library; only logged-in members can watch it.</p>
           <label>Video file <input type="file" name="file" accept="video/*" required /></label>
+          <label>Library <small>Who can watch it</small><select name="program"><option value="academy">Creator Academy members</option><option value="cc">Creator Consciousness alumni</option></select></label>
           <div class="row">
             <label>Title <input name="title" required placeholder="Weekly Call: Finding your voice" /></label>
             <label>Call date <input type="date" name="date" required value="${today()}" /></label>
@@ -97,7 +98,7 @@
           <p class="fine">Keep this tab open until it says Published. The video takes a few minutes to finish processing before it plays.</p>
         </form>
         ${d.replays.length ? `<div class="card"><div class="kicker">In the library</div><table class="ac-table"><tbody>
-          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}</td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
+          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}<br><span class="fine">${r.program === 'cc' ? 'Creator Consciousness' : 'Academy'}</span></td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
         </tbody></table></div>` : ''}
 
         <h2>Included access</h2>
@@ -114,9 +115,20 @@
           ${d.comps.map((c) => `<tr><td>${esc(c.email)}</td><td>${esc(fmtDate(c.until, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(c.note || '')}</td><td><button class="linkish" data-delcomp="${esc(c.email)}">Remove</button></td></tr>`).join('')}
         </tbody></table></div>` : ''}
 
+        <h2>Creator Consciousness alumni</h2>
+        <form class="card ac-form" id="alumni">
+          <p>Alumni can log in and watch the Creator Consciousness library. Anyone who pays on the Creator Consciousness page is added automatically. Add past participants here (one email per line, or comma-separated).</p>
+          <label>Emails <textarea name="emails" style="min-height:90px"></textarea></label>
+          <label>Cohort <small>Optional</small><input name="cohort" placeholder="Fall 2026" /></label>
+          <button class="btn-primary" type="submit">Add alumni</button>
+        </form>
+        ${d.alumni.length ? `<div class="card" style="overflow-x:auto"><table class="ac-table"><thead><tr><th>Email</th><th>Cohort</th><th>Added by</th><th></th></tr></thead><tbody>
+          ${d.alumni.map((a) => `<tr><td>${esc(a.email)}</td><td>${esc(a.cohort || '')}</td><td>${a.source === 'stripe' ? 'Payment' : 'Camila'}</td><td><button class="linkish" data-delalumni="${esc(a.email)}">Remove</button></td></tr>`).join('')}
+        </tbody></table></div>` : ''}
+
         <h2>Members <span class="fine">${active} with access · ${d.roster.length} accounts</span></h2>
-        <div class="card" style="overflow-x:auto">${d.roster.length ? `<table class="ac-table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Plan</th><th>Renews / ends</th><th>Founders RSVP</th></tr></thead><tbody>
-          ${d.roster.sort((a, b) => Number(b.member) - Number(a.member)).map((r) => `<tr><td>${esc(r.name || '')}</td><td>${esc(r.email)}</td><td>${statusPill(r)}${r.cancelAtPeriodEnd ? ' <span class="fine">canceling</span>' : ''}</td><td>${esc(r.plan || '')}</td><td>${r.periodEnd ? esc(fmtDate(r.periodEnd, { month: 'short', day: 'numeric' })) : ''}</td><td>${r.foundersRsvp ? '✦' : ''}</td></tr>`).join('')}
+        <div class="card" style="overflow-x:auto">${d.roster.length ? `<table class="ac-table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Plan</th><th>Renews / ends</th><th>CC alum</th><th>Founders RSVP</th></tr></thead><tbody>
+          ${d.roster.sort((a, b) => Number(b.member) - Number(a.member)).map((r) => `<tr><td>${esc(r.name || '')}</td><td>${esc(r.email)}</td><td>${statusPill(r)}${r.cancelAtPeriodEnd ? ' <span class="fine">canceling</span>' : ''}</td><td>${esc(r.plan || '')}</td><td>${r.periodEnd ? esc(fmtDate(r.periodEnd, { month: 'short', day: 'numeric' })) : ''}</td><td>${r.cc ? '✦' : ''}</td><td>${r.foundersRsvp ? '✦' : ''}</td></tr>`).join('')}
         </tbody></table>` : '<p class="muted">No accounts yet.</p>'}</div>
       </div>`;
 
@@ -135,6 +147,9 @@
       form('comp', async (f) => {
         try { await api('/api/academy/admin', { action: 'grantComp', ...Object.fromEntries(f) }); ok(`Access given to ${f.get('email')}.`); await render(); } catch (e) { fail(e); }
       });
+      form('alumni', async (f) => {
+        try { const r = await api('/api/academy/admin', { action: 'addAlumni', emails: f.get('emails'), cohort: f.get('cohort') }); ok(`Added ${r.added} alumni.`); await render(); } catch (e) { fail(e); }
+      });
       form('upload', async (f) => {
         const file = f.get('file');
         const prog = document.getElementById('prog');
@@ -152,13 +167,14 @@
             });
             up.start();
           });
-          await api('/api/academy/admin', { action: 'addReplay', uid, title: f.get('title'), date: f.get('date'), note: f.get('note') });
+          await api('/api/academy/admin', { action: 'addReplay', uid, title: f.get('title'), date: f.get('date'), note: f.get('note'), program: f.get('program') });
           ok('Published ✦ The replay will be watchable once Cloudflare finishes processing (usually a few minutes).');
           await render();
         } catch (e) { prog.hidden = true; fail(e); }
       });
       app.querySelectorAll('[data-delpost]').forEach((b) => (b.onclick = () => confirm('Delete this post and its replies?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'deletePost', id: b.dataset.delpost }); await render(); } catch (e) { fail(e); } })));
       app.querySelectorAll('[data-delreplay]').forEach((b) => (b.onclick = () => confirm('Remove this replay from the library? (The video stays in Cloudflare.)') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeReplay', uid: b.dataset.delreplay }); await render(); } catch (e) { fail(e); } })));
+      app.querySelectorAll('[data-delalumni]').forEach((b) => (b.onclick = () => confirm('Remove this person from the alumni library?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeAlumni', email: b.dataset.delalumni }); await render(); } catch (e) { fail(e); } })));
       app.querySelectorAll('[data-delcomp]').forEach((b) => (b.onclick = () => confirm('Remove included access for this email?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeComp', email: b.dataset.delcomp }); await render(); } catch (e) { fail(e); } })));
     }
     await render();

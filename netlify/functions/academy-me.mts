@@ -28,7 +28,7 @@ export default async (req: Request, context: Context) => {
     plan: rec.plan ?? null,
     periodEnd: rec.periodEnd ?? null,
     cancelAtPeriodEnd: !!rec.cancelAtPeriodEnd,
-    trialAvailable: !rec.trialUsed,
+    cc: access.cc,
     hasBilling: !!rec.customerId,
     foundersRsvp: !!rec.foundersRsvp,
     admin: isAdmin(user),

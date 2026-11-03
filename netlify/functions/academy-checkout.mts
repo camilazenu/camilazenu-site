@@ -3,7 +3,6 @@ import type { Context } from "@netlify/functions"
 import { accessFor, academyOpen, currentUser, fail, getRecord, json, saveRecord, stripe } from "../lib/academy.mts"
 
 const LOOKUP = { monthly: "academy_monthly", yearly: "academy_yearly" } as const
-const TRIAL_DAYS = 7
 
 const handler = async (req: Request, context: Context) => {
   const user = await currentUser()
@@ -33,7 +32,6 @@ const handler = async (req: Request, context: Context) => {
   }
 
   const origin = new URL(req.url).origin
-  const trial = !rec.trialUsed && plan === "monthly"
   const session = await s.checkout.sessions.create({
     mode: "subscription",
     customer: rec.customerId,
@@ -41,7 +39,6 @@ const handler = async (req: Request, context: Context) => {
     line_items: [{ price: price.id, quantity: 1 }],
     allow_promotion_codes: true,
     subscription_data: {
-      ...(trial ? { trial_period_days: TRIAL_DAYS } : {}),
       metadata: { offer: "creator-academy", plan, identityUserId: user.id },
     },
     metadata: { offer: "creator-academy", plan, identityUserId: user.id },
