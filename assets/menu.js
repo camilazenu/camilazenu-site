@@ -27,7 +27,7 @@
       ]
     },
     { label: 'About', href: '/about' },
-    { label: 'Camila’s favorites', href: '/links' },
+    { label: 'Products I Love', href: '/links' },
   ];
 
   function item(i) {
