@@ -6,38 +6,57 @@
   <title>About Camila Zenu · Creator Consciousness</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* Warm Devotional family */
-      --linen: #F4E6D2;
-      --linen-soft: #FAF1E2;
-      --wheat: #E4C9A6;
-      --saffron: #C29030;
-      --saffron-light: #D9A95A;
-      --henna: #6B2F1E;
-      --henna-light: #8B4632;
-      --earth: #3A1F12;
-      /* Jungle Canopy family */
-      --sage-mist: #A8B89E;
-      --moss: #6B8268;
-      --jungle: #2D4A35;
-      --canopy: #1B3424;
-      --forest-deep: #1A2A1F;
-      /* Legacy aliases */
-      --beige-light: var(--linen);
-      --beige: #EBD7B8;
-      --beige-deep: var(--wheat);
-      --parchment: var(--linen);
-      --sand: var(--wheat);
-      --gold: var(--saffron);
-      --gold-light: var(--saffron-light);
-      --sage: var(--sage-mist);
-      --sage-deep: var(--moss);
-      --forest: var(--jungle);
-      --umber: var(--henna);
-      --umber-light: var(--henna-light);
-      --ink: var(--earth);
+      /* Brand tokens: bone, stone, brown, one clay accent */
+      --bone: #F4EFE7;
+      --paper: #FBF8F2;
+      --stone-light: #E9E2D6;
+      --stone: #DCD3C5;
+      --line: #D6CCBD;
+      --taupe: #6F5F50;
+      --clay: #865334;
+      --clay-soft: #D8BFA8;
+      --brown: #5A3A28;
+      --brown-deep: #4A2F20;
+      --font-display: 'Libre Caslon Display', Georgia, serif;
+      --font-quote: 'Libre Caslon Text', Georgia, serif;
+      --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+      /* Older names, mapped so every page picks up the brand */
+      --linen: var(--bone);
+      --linen-soft: var(--paper);
+      --wheat: var(--stone);
+      --saffron: var(--clay);
+      --saffron-light: var(--clay-soft);
+      --henna: var(--taupe);
+      --henna-light: var(--taupe);
+      --earth: var(--brown-deep);
+      --sage-mist: var(--stone);
+      --moss: var(--clay);
+      --jungle: var(--brown);
+      --canopy: var(--brown);
+      --forest-deep: var(--brown-deep);
+      --beige-light: var(--bone);
+      --beige: var(--stone-light);
+      --beige-deep: var(--stone);
+      --parchment: var(--bone);
+      --parchment-dark: var(--stone);
+      --sand: var(--stone);
+      --terra: var(--clay);
+      --terra-dark: var(--clay);
+      --gold: var(--clay);
+      --gold-light: var(--clay-soft);
+      --sage: var(--stone);
+      --sage-deep: var(--clay);
+      --moss-light: var(--clay);
+      --forest: var(--brown);
+      --umber: var(--taupe);
+      --umber-light: var(--taupe);
+      --cream: var(--paper);
+      --ink: var(--brown-deep);
+      --dark: var(--brown-deep);
+      --dark-nav: var(--brown);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,61 +64,19 @@
     body {
       -webkit-font-smoothing: antialiased;
       color: var(--ink);
-      font-family: 'Lora', Georgia, serif;
+      font-family: var(--font-body);
       font-size: 1.05rem;
       line-height: 1.8;
       background-color: var(--beige-light);
-      background-image:
-        radial-gradient(ellipse at 50% 32%, transparent 45%, rgba(58, 42, 24, 0.18) 100%),
-        linear-gradient(180deg,
-          var(--beige-light) 0%,
-          var(--beige) 25%,
-          #e3dcc6 55%,
-          #c9d3bf 80%,
-          var(--sage) 100%);
-      background-attachment: fixed;
+      
       position: relative;
     }
-    /* Grain overlay (lightweight) */
-    body > .grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 50;
-      opacity: 0.5;
-      background-image:
-        radial-gradient(rgba(60,42,22,0.18) 0.5px, transparent 1px),
-        radial-gradient(rgba(60,42,22,0.12) 0.5px, transparent 1px);
-      background-size: 3px 3px, 5px 5px;
-      background-position: 0 0, 1px 2px;
-    }
+    body > .grain { display: none; }
 
-    /* Coiled snake background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: min(150vmin, 1400px);
-      height: min(150vmin, 1400px);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.18;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'><g stroke='%231f2a1c' fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke-width='8' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='11' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='15' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='21' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='29' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='39' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='52' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%236b8268' fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke-width='5' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='8' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='12' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='18' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='26' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='36' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='49' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%23a3b89c' fill='none' stroke-linecap='round' opacity='0.65'><path stroke-width='2' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='3' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='4' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='6' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='9' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='13' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='18' d='M240 400 a200 200 0 1 1 400 0'/></g><g stroke='%231f2a1c' fill='none' stroke-linecap='butt' stroke-dasharray='2 5' opacity='0.55'><path stroke-width='6' d='M400 400 m0 0 a6 6 0 1 1 12 0'/><path stroke-width='9' d='M412 400 a18 18 0 1 1 -36 0'/><path stroke-width='13' d='M376 400 a36 36 0 1 1 72 0'/><path stroke-width='19' d='M448 400 a60 60 0 1 1 -120 0'/><path stroke-width='27' d='M328 400 a96 96 0 1 1 192 0'/><path stroke-width='37' d='M520 400 a140 140 0 1 1 -280 0'/><path stroke-width='50' d='M240 400 a200 200 0 1 1 400 0'/></g></svg>");
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: contain;
-      animation: snakeDrift 90s linear infinite;
-    }
-    @keyframes snakeDrift {
-      from { transform: translate(-50%, -50%) rotate(0deg); }
-      to   { transform: translate(-50%, -50%) rotate(360deg); }
-    }
+
     body > * { position: relative; z-index: 1; }
-    @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
     h1, h2, h3, h4, h5, h6 {
-      font-family: 'Cormorant Garamond', 'Lora', Georgia, serif;
+      font-family: var(--font-display);
       letter-spacing: -0.012em;
     }
 
@@ -111,10 +88,8 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(247, 241, 230, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(143, 166, 136, 0.25);
+      background: var(--bone);
+      border-bottom: 1px solid var(--line);
     }
     .nav-inner {
       max-width: 1100px;
@@ -125,20 +100,16 @@
       justify-content: space-between;
     }
     .nav-logo {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: 1.05rem;
       font-weight: 600;
       color: var(--forest);
-      letter-spacing: .08em;
-      font-style: italic;
     }
     .nav-right { display: flex; align-items: center; gap: 1.75rem; }
     .nav-link {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
-      letter-spacing: .18em;
-      text-transform: uppercase;
       color: var(--forest);
       padding-bottom: 2px;
       border-bottom: 1px solid transparent;
@@ -146,11 +117,9 @@
     }
     .nav-link:hover { border-bottom-color: var(--sage-deep); color: var(--moss); }
     .nav-cta {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .75rem;
       font-weight: 500;
-      letter-spacing: .14em;
-      text-transform: uppercase;
       color: var(--forest);
       border: 1px solid var(--sage-deep);
       padding: .55rem 1.25rem;
@@ -165,18 +134,15 @@
       text-align: center;
     }
     .about-hero .eyebrow {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
-      letter-spacing: .28em;
-      text-transform: uppercase;
       color: var(--sage-deep);
       margin-bottom: 1.25rem;
     }
     .about-hero h1 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
+      font-family: var(--font-display);
       font-size: clamp(2.6rem, 6vw, 4.4rem);
-      font-style: italic;
       font-weight: 600;
       color: var(--forest);
       line-height: 1.1;
@@ -184,8 +150,7 @@
       margin-bottom: 1rem;
     }
     .about-hero .subtitle {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-size: clamp(1.05rem, 2vw, 1.25rem);
       color: var(--umber);
       max-width: 640px;
@@ -201,9 +166,9 @@
     }
     .ornament-line {
       width: 80px; height: 1px;
-      background: linear-gradient(to right, transparent, var(--gold));
+      background: var(--line);
     }
-    .ornament-line.right { background: linear-gradient(to left, transparent, var(--gold)); }
+    .ornament-line.right { background: var(--line); }
     .ornament-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
 
     /* Photo card */
@@ -216,18 +181,9 @@
       width: 100%;
       aspect-ratio: 4/5;
       object-fit: cover;
-      border-radius: 4px;
-      box-shadow: 0 22px 60px rgba(61,90,61,0.22);
+      border-radius: 2px;
     }
-    .photo-frame::after {
-      content: '';
-      position: absolute;
-      inset: -16px -16px 16px 16px;
-      border: 1px solid var(--gold-light);
-      border-radius: 4px;
-      z-index: -1;
-      opacity: 0.6;
-    }
+
 
     /* Story body */
     .story {
@@ -243,8 +199,7 @@
     }
     .story p .lead-cap {
       float: left;
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-size: 3.4rem;
       line-height: .9;
       color: var(--sage-deep);
@@ -255,7 +210,7 @@
 
     /* Pull quote panel */
     .quote-band {
-      background: linear-gradient(135deg, var(--forest), #2a3d2a 60%, #1f2a1c);
+      background: var(--brown);
       margin: 30px 0;
       position: relative;
       overflow: hidden;
@@ -267,8 +222,7 @@
       text-align: center;
     }
     .quote-band blockquote {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-size: clamp(1.25rem, 2.4vw, 1.7rem);
       color: var(--beige-light);
       line-height: 1.7;
@@ -282,18 +236,15 @@
       padding: 70px 2rem;
     }
     .creds-title {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .72rem;
       font-weight: 500;
-      letter-spacing: .28em;
-      text-transform: uppercase;
       color: var(--sage-deep);
       text-align: center;
       margin-bottom: 1rem;
     }
     .creds-heading {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-weight: 600;
       font-size: clamp(1.7rem, 3.4vw, 2.4rem);
       color: var(--forest);
@@ -306,15 +257,14 @@
       gap: 1.25rem;
     }
     .cred-card {
-      background: rgba(255, 251, 240, 0.78);
-      border: 1px solid rgba(184, 152, 90, 0.22);
+      background: var(--paper);
+      border: 1px solid var(--line);
       border-top: 2px solid var(--sage-deep);
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 1.6rem 1.4rem;
     }
     .cred-card h3 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-weight: 600;
       font-size: 1.05rem;
       color: var(--forest);
@@ -333,22 +283,19 @@
       border-radius: 50%;
       overflow: hidden;
       border: 3px solid var(--gold-light);
-      box-shadow: 0 10px 28px rgba(61,90,61,0.18);
     }
     .headshot-inset img { aspect-ratio: 1/1; object-fit: cover; }
 
     /* CTA band */
     .cta-band {
-      background: rgba(247, 241, 230, 0.62);
-      backdrop-filter: blur(6px);
-      border-top: 1px solid rgba(143, 166, 136, 0.18);
-      border-bottom: 1px solid rgba(143, 166, 136, 0.18);
+      background: var(--paper);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
       text-align: center;
       padding: 90px 2rem;
     }
     .cta-band h2 {
-      font-family: 'Cormorant Garamond', 'Lora', serif;
-      font-style: italic;
+      font-family: var(--font-display);
       font-weight: 600;
       font-size: clamp(1.8rem, 3.6vw, 2.5rem);
       color: var(--forest);
@@ -358,35 +305,29 @@
       max-width: 540px;
       margin: 0 auto 2rem;
       color: var(--umber);
-      font-style: italic;
     }
     .btn-primary {
       display: inline-block;
-      background: linear-gradient(135deg, var(--sage-deep), var(--moss));
-      color: #fdfaf2;
-      font-family: 'Inter', sans-serif;
+      background: var(--brown);
+      color: var(--bone);
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
-      letter-spacing: .14em;
-      text-transform: uppercase;
       padding: 1rem 2.25rem;
       border-radius: 2px;
       border: 1px solid rgba(255,255,255,0.15);
       cursor: pointer;
       text-decoration: none;
       transition: opacity .25s, transform .25s, box-shadow .25s;
-      box-shadow: 0 4px 18px rgba(61,90,61,0.18);
     }
-    .btn-primary:hover { opacity: .95; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(61,90,61,0.28); }
+    .btn-primary:hover { opacity: .95; }
     .btn-outline {
       background: transparent;
       border: 1px solid var(--sage-deep);
       color: var(--sage-deep);
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-body);
       font-size: .82rem;
       font-weight: 500;
-      letter-spacing: .14em;
-      text-transform: uppercase;
       padding: .9rem 2rem;
       border-radius: 2px;
       cursor: pointer;
@@ -397,13 +338,12 @@
     .cta-band .actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
     footer {
-      background: #1f2a1c;
-      color: #9aaa92;
+      background: var(--brown);
+      color: var(--stone);
       text-align: center;
       padding: 2.5rem 2rem;
       font-size: .82rem;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: .06em;
+      font-family: var(--font-body);
     }
     footer a { color: var(--gold-light); }
     footer a:hover { text-decoration: underline; }
@@ -420,9 +360,66 @@
 
     @media (max-width: 600px) {
       .nav-right { gap: .9rem; }
-      .nav-link { font-size: .68rem; letter-spacing: .12em; }
-      .photo-frame::after { display: none; }
+      .nav-link { font-size: .68rem; }
+
     }
+
+    /* ── Brand refresh: shared refinements ──────────────────────── */
+    body { background: var(--bone); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.7; font-synthesis: none; }
+    h1, h2, h3, h4, h5, h6 { font-weight: 400; color: var(--brown); }
+    em, i, .italic { color: inherit; }
+    .text-gradient-gold { color: inherit; }
+    .reveal { transform: translateY(12px); transition: opacity .5s, transform .5s; }
+
+    .btn-primary, .btn-outline {
+      display: inline-block; font-family: var(--font-body); font-size: .95rem; font-weight: 500;
+      padding: .85rem 1.6rem; border-radius: 2px; border: 1px solid var(--brown);
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .btn-primary, .btn-gold { background: var(--brown); color: var(--bone); }
+    .btn-primary:hover { background: var(--brown-deep); border-color: var(--brown-deep); opacity: 1; }
+    .btn-outline, .hero-actions .btn-outline, .about-teaser-text .btn-outline { background: transparent; color: var(--brown); border-color: var(--brown); }
+    .btn-outline:hover, .hero-actions .btn-outline:hover, .about-teaser-text .btn-outline:hover { background: var(--brown); color: var(--bone); }
+
+    .nav-fixed { background: var(--bone); border-bottom: 1px solid var(--line); }
+    .nav-logo { font-family: var(--font-quote); font-size: 1.08rem; font-weight: 400; color: var(--brown); }
+    .nav-link { font-size: .95rem; color: var(--brown); }
+    .nav-link:hover { border-bottom-color: var(--brown); color: var(--brown); }
+    .nav-cta { font-size: .95rem; color: var(--brown); border-color: var(--brown); }
+    .nav-cta:hover { background: var(--brown); color: var(--bone); }
+
+    footer { background: var(--brown); color: var(--stone); font-size: .9rem; }
+    footer a { color: var(--bone); text-decoration: underline; text-underline-offset: 2px; }
+    .ornament { display: none; }
+
+    /* About page */
+    .about-hero { max-width: 720px; margin: 0 auto; padding: 140px 2rem 32px; text-align: left; }
+    .about-hero .eyebrow { font-size: .95rem; color: var(--clay); margin-bottom: .75rem; }
+    .about-hero h1 { font-family: var(--font-display); font-weight: 400; color: var(--brown); font-size: clamp(3rem, 8vw, 5rem); line-height: 1.02; }
+    .about-hero .subtitle { font-family: var(--font-body); color: var(--taupe); margin: 0; }
+    .photo-frame { max-width: none; margin-top: 1.75rem; }
+    .photo-frame img { border-radius: 0; }
+    .story p .lead-cap { font-family: var(--font-display); color: var(--clay); }
+    .story p strong { color: var(--brown); }
+    .story p em { color: inherit; }
+    .quote-band { background: var(--brown); }
+    .quote-band blockquote { font-family: var(--font-quote); font-style: italic; color: var(--bone); }
+    .quote-band blockquote span { color: var(--clay-soft); }
+    .creds-title { font-size: .95rem; color: var(--clay); text-align: left; }
+    .creds-heading { font-family: var(--font-display); font-weight: 400; color: var(--brown); text-align: left; font-size: clamp(2rem, 4vw, 2.8rem); }
+    .cred-card { background: transparent; border: 0; border-top: 1px solid var(--brown); border-radius: 0; padding: 1.1rem 0 0; }
+    .cred-card h3 { font-family: var(--font-quote); font-weight: 400; font-size: 1.15rem; }
+    .headshot-inset { border: 0; }
+    .cta-band { background: var(--stone-light); border: 0; }
+    .cta-band h2 { font-family: var(--font-display); font-weight: 400; color: var(--brown); font-size: clamp(2rem, 4vw, 2.8rem); }
+    .cta-band p { color: var(--taupe); }
+    @media (max-width: 640px) {
+      .about-hero { padding: 104px 1.25rem 24px; }
+      .story, .creds-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+    }
+
+    /* Long Book a Call label: drop the wordmark on phones so it fits */
+    @media (max-width: 640px) { .nav-logo { display: none; } }
   </style>
   <link rel="stylesheet" href="/assets/menu.css" />
 </head>
@@ -431,7 +428,7 @@
 
   <nav class="nav-fixed">
     <div class="nav-inner">
-      <a class='nav-logo' href='/'>Creator Consciousness</a>
+      <a class='nav-logo' href='/'>Camila Zenu</a>
       <div class="nav-right">
         <a class='nav-link' href='/'>Home</a>
         <a href="https://calendly.com/camilazenu/creator-consciousness-discovery-call" target="_blank" rel="noopener" class="nav-cta">Book a Call with Camila</a>
