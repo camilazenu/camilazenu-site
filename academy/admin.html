@@ -51,6 +51,9 @@
     let q = '', f = '', D = null;
     const libOptions = (sel) => [['academy', 'Creator Academy members'], ...D.libraries.map((l) => [l.id, l.name])]
       .map(([v, t]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(t)}</option>`).join('');
+    const audienceOptions = (sel) => [['academy', 'Creator Academy members'], ['cc', 'Creator Consciousness · every round'], ...D.libraries.map((l) => [l.id, `${l.name} only`])]
+      .map(([v, t]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(t)}</option>`).join('');
+    const audienceName = (a) => !a || a === 'academy' ? 'Creator Academy' : a === 'cc' ? 'All CC rounds' : (D.libraries.find((l) => l.id === a)?.short || a);
     const academyCell = (r) => {
       if (r.paid) return `<span class="pill on">Paid · ${esc(r.plan || '')}</span>${r.cancelAtPeriodEnd ? '<br><span class="fine">canceling</span>' : ''}`;
       const sw = `<label class="switch"><input type="checkbox" data-academy="${esc(r.email)}" ${r.compUntil ? 'checked' : ''} /><span></span></label>`;
@@ -115,15 +118,18 @@
           <button class="btn-primary" type="submit">Save call details</button>
         </form>
 
-        <h2>Post a prompt or update</h2>
+        <h2>Post a prompt or resource</h2>
         <form class="card ac-form" id="post">
-          <label>Type <select name="kind"><option value="prompt">Weekly prompt</option><option value="resource">Resource</option><option value="post">Update from Camila</option></select></label>
+          <div class="row">
+            <label>Type <select name="kind"><option value="prompt">Weekly prompt</option><option value="resource">Resource</option><option value="post">Update from Camila</option></select></label>
+            <label>Who sees it <select name="audience">${audienceOptions('academy')}</select></label>
+          </div>
           <label>Title <input name="title" required /></label>
           <label>Message <textarea name="body"></textarea></label>
-          <button class="btn-primary" type="submit">Publish to members</button>
+          <button class="btn-primary" type="submit">Publish</button>
         </form>
         ${d.posts.length ? `<div class="card"><div class="kicker">Published</div><table class="ac-table"><tbody>
-          ${[...d.posts].sort((a, b) => b.createdAt - a.createdAt).map((p) => `<tr><td>${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td><td>${esc(p.title)}<br><span class="fine">${p.kind} · ${p.comments.length} replies</span></td><td><button class="linkish" data-delpost="${esc(p.id)}">Delete</button></td></tr>`).join('')}
+          ${[...d.posts].sort((a, b) => b.createdAt - a.createdAt).map((p) => `<tr><td>${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td><td>${esc(p.title)}<br><span class="fine">${p.kind} · ${esc(audienceName(p.audience))} · ${p.comments.length} replies</span></td><td><button class="linkish" data-delpost="${esc(p.id)}">Delete</button></td></tr>`).join('')}
         </tbody></table></div>` : ''}
 
         <h2>Replays</h2>
@@ -196,7 +202,7 @@
         } catch (e) { fail(e); }
       });
       form('post', async (f) => {
-        try { await api('/api/academy/admin', { action: 'addPost', ...Object.fromEntries(f) }); ok('Published to members.'); await render(); } catch (e) { fail(e); }
+        try { await api('/api/academy/admin', { action: 'addPost', ...Object.fromEntries(f) }); ok(`Published to ${audienceName(f.get('audience'))}.`); await render(); } catch (e) { fail(e); }
       });
       drawRows();
       document.getElementById('q').oninput = (e) => { q = e.target.value; drawRows(); };

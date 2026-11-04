@@ -148,6 +148,12 @@ export async function accessFor(context: Context, rec: Pick<MemberRecord, "email
 export const canWatch = (program: Program, a: { member: boolean; libraries: string[] }, admin: boolean) =>
   admin || (program === "academy" ? a.member : a.libraries.includes(program))
 
+/** Who can read (and reply to) a prompt, resource or update. */
+export const canSeePost = (post: { audience?: string }, a: { member: boolean; libraries: string[] }, admin: boolean) => {
+  const aud = post.audience ?? "academy"
+  return admin || (aud === "academy" ? a.member : aud === "cc" ? a.libraries.length > 0 : a.libraries.includes(aud))
+}
+
 // ── Libraries ────────────────────────────────────────────────────
 
 export interface Library {
@@ -267,6 +273,7 @@ export interface Comment {
 export interface Post {
   id: string
   kind: "prompt" | "post" | "resource"
+  audience?: string // "academy" (missing = academy), "cc" = every Creator Consciousness round, or one library id ("cc2")
   title: string
   body: string
   createdAt: number

@@ -114,8 +114,9 @@
 
     function renderMember(me, c) {
       TABS = [
-        ...(c.academy ? [['call', 'This week'], ['feed', 'Prompts & resources'], ['replays', 'Academy replays']] : []),
-        ...(c.libraries || []).map((l) => [`lib-${l.id}`, l.short]),
+        ...(c.academy ? [['call', 'This week'], ['feed', 'Academy prompts & resources'], ['replays', 'Academy replays']] : []),
+        ...(c.cc ? [['ccfeed', 'CC prompts & resources']] : []),
+        ...(c.libraries || []).map((l) => [`lib-${l.id}`, `${l.short} videos`]),
         ...(!c.academy ? [['join', 'Join the Academy']] : []),
         ['account', 'Account'],
       ];
@@ -125,6 +126,8 @@
 
       (c.libraries || []).forEach((l) => (document.getElementById(`tab-lib-${l.id}`).innerHTML =
         `<h2>${esc(l.name)}</h2><p>Recordings from your round of the program.</p>${replayList(l.replays, 'Recordings from this round will appear here.')}`));
+      if (c.cc) renderFeed(me, document.getElementById('tab-ccfeed'), c.ccPosts || [], 'ccfeed', 'Prompts and resources for your Creator Consciousness round will appear here.',
+        '<h2>Creator Consciousness prompts &amp; resources</h2>');
       if (!c.academy) renderJoin(me, c, document.getElementById('tab-join'));
       if (c.academy) renderAcademy(me, c);
       renderAccount(me);
@@ -155,10 +158,18 @@
         ${c.founders.zoomUrl ? `<div class="card"><div class="kicker">Founders Call · Tue, Nov 10 · 6:00 PM PT</div><div class="actions"><a class="btn-outline" href="${esc(c.founders.zoomUrl)}" target="_blank" rel="noopener">Join the Founders Call</a></div></div>` : ''}`;
 
       // Feed
-      document.getElementById('tab-feed').innerHTML = c.posts.length
-        ? c.posts.map((p) => `
+      renderFeed(me, document.getElementById('tab-feed'), c.posts, 'feed', 'The first prompt drops soon.');
+
+      // Replays
+      document.getElementById('tab-replays').innerHTML = `<h2>Academy replays</h2>${replayList(c.replays, 'Replays of each weekly call will appear here.')}`;
+    }
+
+    // Prompts, resources and updates with replies. Used for the Academy feed and the Creator Consciousness feed.
+    function renderFeed(me, el, posts, tab, empty, heading = '') {
+      el.innerHTML = heading + (posts.length
+        ? posts.map((p) => `
           <article class="card post" data-post="${esc(p.id)}">
-            <div class="kicker">${p.kind === 'prompt' ? 'Prompt' : p.kind === 'resource' ? 'Resource' : 'From Camila'} · ${esc(fmtDate(p.createdAt))}</div>
+            <div class="kicker">${p.kind === 'prompt' ? 'Prompt' : p.kind === 'resource' ? 'Resource' : 'From Camila'}${p.audienceName ? ` · ${esc(p.audienceName)}` : ''} · ${esc(fmtDate(p.createdAt))}</div>
             <h3>${esc(p.title)}</h3>
             ${p.body ? `<div class="post-body">${rich(p.body)}</div>` : ''}
             <div class="comments">
@@ -168,22 +179,19 @@
                 <button class="btn-outline" type="submit" style="justify-self:start">Post</button></form>
             </div>
           </article>`).join('')
-        : '<p class="muted">The first prompt drops soon.</p>';
-      app.querySelectorAll('.post').forEach((el) => {
-        const postId = el.dataset.post;
-        el.querySelector('form').onsubmit = (ev) => {
+        : `<p class="muted">${empty}</p>`);
+      el.querySelectorAll('.post').forEach((post) => {
+        const postId = post.dataset.post;
+        post.querySelector('form').onsubmit = (ev) => {
           ev.preventDefault();
           const body = new FormData(ev.target).get('body');
-          busy(ev.submitter, async () => { try { await api('/api/academy/comment', { postId, body }); await boot('feed'); } catch (e) { fail(e); } });
+          busy(ev.submitter, async () => { try { await api('/api/academy/comment', { postId, body }); await boot(tab); } catch (e) { fail(e); } });
         };
-        el.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
+        post.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => {
           if (!confirm('Delete this comment?')) return;
-          busy(b, async () => { try { await api('/api/academy/comment', { postId, deleteId: b.dataset.del }); await boot('feed'); } catch (e) { fail(e); } });
+          busy(b, async () => { try { await api('/api/academy/comment', { postId, deleteId: b.dataset.del }); await boot(tab); } catch (e) { fail(e); } });
         }));
       });
-
-      // Replays
-      document.getElementById('tab-replays').innerHTML = `<h2>Academy replays</h2>${replayList(c.replays, 'Replays of each weekly call will appear here.')}`;
     }
 
     function wirePlayers() {

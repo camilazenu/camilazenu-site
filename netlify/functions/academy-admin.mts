@@ -136,7 +136,9 @@ export default async (req: Request, context: Context) => {
       const title = str(b.title, 200), body = str(b.body, 8000)
       if (!title) return fail("Give it a title.", 400)
       const posts = await getPosts(context)
-      posts.push({ id: newId(), kind: b.kind === "prompt" || b.kind === "resource" ? b.kind : "post", title, body, createdAt: Date.now(), comments: [] })
+      const audience = str(b.audience, 40) || "academy"
+      if (audience !== "academy" && audience !== "cc" && !(await getLibraries(context)).some((l) => l.id === audience)) return fail("Pick who sees it.", 400)
+      posts.push({ id: newId(), kind: b.kind === "prompt" || b.kind === "resource" ? b.kind : "post", audience, title, body, createdAt: Date.now(), comments: [] })
       await savePosts(context, posts)
       return json({ ok: true })
     }

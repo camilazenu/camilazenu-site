@@ -1,19 +1,18 @@
 // POST /api/academy/comment {postId, body} | {postId, deleteId} — members reply to prompts and posts.
 import type { Context } from "@netlify/functions"
-import { accessFor, currentUser, displayName, fail, getPosts, getRecord, isAdmin, json, newId, savePosts } from "../lib/academy.mts"
+import { accessFor, canSeePost, currentUser, displayName, fail, getPosts, getRecord, isAdmin, json, newId, savePosts } from "../lib/academy.mts"
 
 export default async (req: Request, context: Context) => {
   const user = await currentUser()
   if (!user) return fail("Please log in.", 401)
   const rec = await getRecord(context, user)
-  const { member } = await accessFor(context, rec)
+  const access = await accessFor(context, rec)
   const admin = isAdmin(user)
-  if (!member && !admin) return fail("Members only.", 403)
 
   const { postId, body, deleteId } = await req.json().catch(() => ({}))
   const posts = await getPosts(context)
   const post = posts.find((p) => p.id === postId)
-  if (!post) return fail("That post is gone.", 404)
+  if (!post || !canSeePost(post, access, admin)) return fail("That post is gone.", 404)
 
   if (deleteId) {
     const c = post.comments.find((x) => x.id === deleteId)
