@@ -113,3 +113,14 @@ body.menu-open { overflow: hidden; }
   .nav-right .nav-cta { font-size: .85rem; padding: .4rem .7rem; }
   .nav-logo { font-size: 1rem; }
 }
+/* Log in / My Academy: always visible, phones included */
+.nav-login { font-family: var(--font-body); font-size: .95rem; font-weight: 500; color: var(--brown, var(--forest)); text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent; white-space: nowrap; transition: border-color .2s; }
+.nav-login:hover, .nav-login[aria-current] { border-bottom-color: currentColor; }
+.menu-list a.menu-account { font-style: italic; }
+@media (max-width: 640px) {
+  .nav-login { font-size: .8rem; }
+  .nav-right { gap: .7rem; }
+}
+@media (max-width: 380px) {
+  .nav-logo { display: none; }
+}

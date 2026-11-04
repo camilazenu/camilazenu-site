@@ -115,7 +115,7 @@
     function renderMember(me, c) {
       TABS = [
         ...(c.academy ? [['call', 'This week'], ['feed', 'Prompts & resources'], ['replays', 'Academy replays']] : []),
-        ...(c.cc ? [['cc', 'Creator Consciousness']] : []),
+        ...(c.libraries || []).map((l) => [`lib-${l.id}`, l.short]),
         ...(!c.academy ? [['join', 'Join the Academy']] : []),
         ['account', 'Account'],
       ];
@@ -123,8 +123,8 @@
         <nav class="ac-tabs">${TABS.map(([id, label]) => `<a href="#${id}" data-tab="${id}">${label}</a>`).join('')}</nav>
         ${TABS.map(([id]) => `<section class="ac-section" id="tab-${id}"></section>`).join('')}`;
 
-      if (c.cc) document.getElementById('tab-cc').innerHTML =
-        `<h2>Creator Consciousness library</h2><p>Recordings from the program, for everyone who has been through it.</p>${replayList(c.ccReplays, 'Program recordings will appear here.')}`;
+      (c.libraries || []).forEach((l) => (document.getElementById(`tab-lib-${l.id}`).innerHTML =
+        `<h2>${esc(l.name)}</h2><p>Recordings from your round of the program.</p>${replayList(l.replays, 'Recordings from this round will appear here.')}`));
       if (!c.academy) renderJoin(me, c, document.getElementById('tab-join'));
       if (c.academy) renderAcademy(me, c);
       renderAccount(me);
@@ -205,7 +205,7 @@
           <dl class="kv">
             <dt>Status</dt><dd>${esc(statusText)}</dd>
             ${me.paid ? `<dt>Plan</dt><dd>${esc(plan)}</dd>` : ''}
-            ${me.cc ? '<dt>Creator Consciousness</dt><dd>Alumni library unlocked</dd>' : ''}
+            ${me.libraries?.length ? `<dt>Your libraries</dt><dd>${me.libraries.map(esc).join(', ')}</dd>` : ''}
             ${me.paid && me.periodEnd ? `<dt>${me.cancelAtPeriodEnd ? 'Access until' : 'Renews'}</dt><dd>${esc(fmtDate(me.periodEnd))}</dd>` : ''}
             ${me.comp ? `<dt>Included access</dt><dd>Through ${esc(fmtDate(me.comp.until))}</dd>` : ''}
             <dt>Email</dt><dd>${esc(me.email)}</dd>

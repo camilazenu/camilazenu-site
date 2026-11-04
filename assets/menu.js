@@ -8,8 +8,13 @@
     location.replace('/academy/login' + location.hash);
     return;
   }
+  // Returning members: Log in (or My Academy once logged in) sits top-right on every page.
+  // Netlify Identity keeps the login in the nf_jwt cookie; the Academy page re-checks it properly.
+  const loggedIn = /(?:^|;\s*)nf_jwt=/.test(document.cookie);
+  const ACCOUNT = loggedIn ? { label: 'My Academy', href: '/academy/' } : { label: 'Log in', href: '/academy/login' };
   const MENU = [
     { label: 'Book a call', href: BOOK_URL, book: true },
+    { label: ACCOUNT.label, href: ACCOUNT.href, account: true },
     { label: 'Home', href: '/' },
     { label: 'Events', href: '/events' },
     { label: 'Creator Consciousness', href: '/creator-consciousness' },
@@ -36,6 +41,7 @@
         `<li><a href="${c.href}"${c.external ? ' target="_blank" rel="noopener"' : ''}>${c.label}${c.external ? ' ↗' : ''}${c.note ? `<small>${c.note}</small>` : ''}</a></li>`).join('');
       return `<li><details><summary>${i.label}</summary><ul class="menu-sub">${subs}</ul></details></li>`;
     }
+    if (i.account) return `<li><a href="${i.href}" class="menu-account">${i.label}</a></li>`;
     if (i.book) return `<li><a href="${i.href}" data-book class="menu-book">${i.label} <span class="menu-tag">Free</span></a></li>`;
     const ext = i.external ? ' target="_blank" rel="noopener"' : '';
     return `<li><a href="${i.href}"${ext}>${i.label}${i.external ? ' ↗' : ''}${i.tag ? `<span class="menu-tag">${i.tag}</span>` : ''}${i.note ? `<small>${i.note}</small>` : ''}</a></li>`;
@@ -97,6 +103,12 @@
     navRight.appendChild(cta);
   }
   document.querySelectorAll('.nav-cta').forEach((a) => { if (/calendly\.com/.test(a.href)) a.setAttribute('data-book', ''); });
+  if (navRight && !navRight.querySelector('.nav-login')) {
+    const login = document.createElement('a');
+    login.className = 'nav-login'; login.href = ACCOUNT.href; login.textContent = ACCOUNT.label;
+    if (location.pathname.replace(/\/$/, '') === ACCOUNT.href.replace(/\/$/, '')) login.setAttribute('aria-current', 'page');
+    navRight.insertBefore(login, navRight.querySelector('.nav-cta'));
+  }
 
   let calendly;
   const loadCalendly = () => calendly ??= new Promise((resolve, reject) => {

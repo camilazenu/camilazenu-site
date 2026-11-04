@@ -2,10 +2,21 @@
 import type { Context } from "@netlify/functions"
 import {
   cloudflare, currentUser, fail, getPosts, getReplays, getSettings, isAdmin, json, newId,
-  removeComp, saveReplays, savePosts, saveSettings, setComp, store, accessFor, addAlumni, removeAlumni, type MemberRecord, type Settings,
+  removeComp, saveReplays, savePosts, saveSettings, setComp, store, accessFor, removeAlumni, type MemberRecord, type Settings,
+  getLibraries, saveLibraries, setLibraryAccess, notifyAccess, getComp, ALUMNI_ACADEMY_UNTIL, type Alumni, type Comp,
 } from "../lib/academy.mts"
 
 const str = (v: unknown, max = 2000) => String(v ?? "").trim().slice(0, max)
+const isEmail = (e: string) => /^[^@\s,;]+@[^@\s,;]+\.[^@\s,;]+$/.test(e)
+const emailList = (v: unknown) =>
+  [...new Set(String(v ?? "").split(/[\s,;<>]+/).map((e) => e.trim().toLowerCase()).filter(isEmail))]
+
+/** Give free Academy through the alumni date, unless they already have later free access. */
+async function alumniComp(context: Context, email: string) {
+  const c = await getComp(context, email)
+  if (c && c.until >= ALUMNI_ACADEMY_UNTIL) return
+  await setComp(context, { email, until: ALUMNI_ACADEMY_UNTIL, note: "Creator Consciousness alumni" })
+}
 
 export default async (req: Request, context: Context) => {
   const user = await currentUser()
@@ -16,22 +27,99 @@ export default async (req: Request, context: Context) => {
   switch (b.action) {
     case "load": {
       const s = store(context)
-      const { blobs } = await s.list({ prefix: "users/" })
-      const members = (
-        await Promise.all(blobs.map((x) => s.get(x.key, { type: "json" }) as Promise<MemberRecord | null>))
-      ).filter(Boolean) as MemberRecord[]
-      const { blobs: compBlobs } = await s.list({ prefix: "comps/" })
-      const comps = await Promise.all(compBlobs.map((x) => s.get(x.key, { type: "json" })))
-      const { blobs: alumniBlobs } = await s.list({ prefix: "ccalumni/" })
-      const alumni = await Promise.all(alumniBlobs.map((x) => s.get(x.key, { type: "json" })))
+      const all = async <T,>(prefix: string) => {
+        const { blobs } = await s.list({ prefix })
+        return (await Promise.all(blobs.map((x) => s.get(x.key, { type: "json" }) as Promise<T | null>))).filter(Boolean) as T[]
+      }
+      const [members, comps, alumni] = await Promise.all([all<MemberRecord>("users/"), all<Comp>("comps/"), all<Alumni>("ccalumni/")])
+      // One row per email: accounts plus people given access who haven't signed up yet.
+      const byEmail = new Map<string, MemberRecord | null>()
+      for (const m of members) if (m.email) byEmail.set(m.email.toLowerCase(), m)
+      for (const x of [...comps, ...alumni]) if (!byEmail.has(x.email)) byEmail.set(x.email, null)
       const roster = await Promise.all(
-        members.map(async (m) => ({
-          email: m.email, name: m.name, status: m.status ?? "none", plan: m.plan ?? null,
-          periodEnd: m.periodEnd ?? null, cancelAtPeriodEnd: !!m.cancelAtPeriodEnd,
-          foundersRsvp: !!m.foundersRsvp, ...(({ member, cc }) => ({ member, cc }))(await accessFor(context, m)),
-        })),
+        [...byEmail].map(async ([email, m]) => {
+          const a = await accessFor(context, { email, status: m?.status })
+          return {
+            email, name: m?.name ?? "", hasAccount: !!m, status: m?.status ?? "none", plan: m?.plan ?? null,
+            periodEnd: m?.periodEnd ?? null, cancelAtPeriodEnd: !!m?.cancelAtPeriodEnd, foundersRsvp: !!m?.foundersRsvp,
+            member: a.member, paid: a.paid, compUntil: a.comp?.until ?? null, libraries: a.libraries,
+            joined: m?.createdAt ?? null,
+          }
+        }),
       )
-      return json({ settings: await getSettings(context), replays: await getReplays(context), posts: await getPosts(context), roster, comps, alumni })
+      return json({
+        settings: await getSettings(context), replays: await getReplays(context), posts: await getPosts(context),
+        roster, libraries: await getLibraries(context), alumniUntil: ALUMNI_ACADEMY_UNTIL,
+      })
+    }
+
+    case "setLibrary": {
+      // One switch on the roster: library on/off for one email.
+      const email = str(b.email, 200).toLowerCase(), library = str(b.library, 40)
+      if (!isEmail(email)) return fail("That email doesn't look right.", 400)
+      if (!(await getLibraries(context)).some((l) => l.id === library)) return fail("Unknown library.", 400)
+      const libs = await setLibraryAccess(context, email, library, !!b.on)
+      if (b.on && b.withAcademy) await alumniComp(context, email)
+      await notifyAccess(context, email, "access-changed")
+      return json({ ok: true, libraries: libs })
+    }
+
+    case "setAcademy": {
+      // Free Academy on/off for one email (paid members are handled by Stripe).
+      const email = str(b.email, 200).toLowerCase()
+      if (!isEmail(email)) return fail("That email doesn't look right.", 400)
+      if (b.on) {
+        const until = /^\d{4}-\d{2}-\d{2}$/.test(str(b.until, 10)) ? str(b.until, 10) : ALUMNI_ACADEMY_UNTIL
+        await setComp(context, { email, until, note: str(b.note, 200) || "Given by Camila" })
+      } else await removeComp(context, email)
+      await notifyAccess(context, email, "access-changed")
+      return json({ ok: true })
+    }
+
+    case "bulkAccess": {
+      // Paste a round's email list: each gets that library, plus free Academy through the alumni date if asked.
+      const library = str(b.library, 40)
+      if (!(await getLibraries(context)).some((l) => l.id === library)) return fail("Pick a library.", 400)
+      const emails = emailList(b.emails)
+      if (!emails.length) return fail("Add at least one email.", 400)
+      if (emails.length > 500) return fail("Up to 500 emails at a time.", 400)
+      for (const email of emails) {
+        await setLibraryAccess(context, email, library, true)
+        if (b.withAcademy) await alumniComp(context, email)
+        if (b.notify !== false) await notifyAccess(context, email, "access-changed")
+      }
+      return json({ ok: true, added: emails.length })
+    }
+
+    case "removePerson": {
+      // Takes away every library and any free Academy. Paid subscriptions are untouched (cancel those in Stripe).
+      const email = str(b.email, 200).toLowerCase()
+      await removeAlumni(context, email)
+      await removeComp(context, email)
+      await notifyAccess(context, email, "access-removed")
+      return json({ ok: true })
+    }
+
+    case "addLibrary": {
+      const name = str(b.name, 80), short = str(b.short, 20) || name
+      if (!name) return fail("Name the library.", 400)
+      const libs = await getLibraries(context)
+      let id = short.toLowerCase().replace(/^creator consciousness/, "cc").replace(/[^a-z0-9]+/g, "")
+      if (!id || id === "academy" || id === "cc" || libs.some((l) => l.id === id)) id = `lib${libs.length + 1}`
+      libs.push({ id, name, short })
+      await saveLibraries(context, libs)
+      return json({ ok: true, id })
+    }
+
+    case "moveReplay": {
+      const program = str(b.program, 40)
+      if (program !== "academy" && !(await getLibraries(context)).some((l) => l.id === program)) return fail("Pick a library.", 400)
+      const replays = await getReplays(context)
+      const r = replays.find((x) => x.uid === b.uid)
+      if (!r) return fail("Replay not found.", 404)
+      r.program = program
+      await saveReplays(context, replays)
+      return json({ ok: true })
     }
 
     case "saveSettings": {
@@ -84,7 +172,9 @@ export default async (req: Request, context: Context) => {
       if (!/^[a-f0-9]{32}$/i.test(uid)) return fail("That video ID doesn't look right.", 400)
       if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("Add a title and a date.", 400)
       const replays = (await getReplays(context)).filter((r) => r.uid !== uid)
-      replays.push({ uid, title, date, note: str(b.note, 1000), program: b.program === "cc" ? "cc" : "academy" })
+      const program = str(b.program, 40) || "academy"
+      if (program !== "academy" && !(await getLibraries(context)).some((l) => l.id === program)) return fail("Pick a library.", 400)
+      replays.push({ uid, title, date, note: str(b.note, 1000), program })
       await saveReplays(context, replays)
       return json({ ok: true })
     }
@@ -99,14 +189,8 @@ export default async (req: Request, context: Context) => {
       const email = str(b.email, 200).toLowerCase(), until = str(b.until, 10)
       if (!/^\S+@\S+\.\S+$/.test(email) || !/^\d{4}-\d{2}-\d{2}$/.test(until)) return fail("Add an email and an end date.", 400)
       await setComp(context, { email, until, note: str(b.note, 200) })
+      await notifyAccess(context, email, "access-changed")
       return json({ ok: true })
-    }
-
-    case "addAlumni": {
-      const emails = String(b.emails ?? "").split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter((e) => /^\S+@\S+\.\S+$/.test(e))
-      if (!emails.length) return fail("Add at least one email.", 400)
-      for (const email of emails) await addAlumni(context, { email, source: "admin", cohort: str(b.cohort, 80) || undefined })
-      return json({ ok: true, added: emails.length })
     }
 
     case "removeAlumni": {

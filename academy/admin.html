@@ -48,10 +48,53 @@
     const today = () => new Date().toLocaleDateString('en-CA');
     const statusPill = (r) => `<span class="pill ${r.member ? 'on' : r.status === 'past_due' ? 'off' : ''}">${esc(r.member && r.status === 'none' ? 'comp' : r.status)}</span>`;
 
+    let q = '', f = '', D = null;
+    const libOptions = (sel) => [['academy', 'Creator Academy members'], ...D.libraries.map((l) => [l.id, l.name])]
+      .map(([v, t]) => `<option value="${esc(v)}" ${v === sel ? 'selected' : ''}>${esc(t)}</option>`).join('');
+    const academyCell = (r) => {
+      if (r.paid) return `<span class="pill on">Paid · ${esc(r.plan || '')}</span>${r.cancelAtPeriodEnd ? '<br><span class="fine">canceling</span>' : ''}`;
+      const sw = `<label class="switch"><input type="checkbox" data-academy="${esc(r.email)}" ${r.compUntil ? 'checked' : ''} /><span></span></label>`;
+      const note = r.compUntil ? `<span class="fine">Free through ${esc(fmtDate(r.compUntil, { month: 'short', day: 'numeric', year: 'numeric' }))}</span>`
+        : r.status === 'past_due' ? '<span class="pill off">Payment issue</span>' : r.status === 'canceled' ? '<span class="fine">Canceled</span>' : '';
+      return `<div class="ac-cell">${sw}${note}</div>`;
+    };
+    function drawRows() {
+      const rows = document.getElementById('rows');
+      const needle = q.trim().toLowerCase();
+      const list = D.roster
+        .filter((r) => !needle || r.email.includes(needle) || (r.name || '').toLowerCase().includes(needle))
+        .filter((r) => !f || (f === 'academy' ? r.member : f === 'paid' ? r.paid : f === 'free' ? !!r.compUntil && !r.paid : f === 'noaccount' ? !r.hasAccount : r.libraries.includes(f)))
+        .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
+      rows.innerHTML = list.length ? list.map((r) => `<tr>
+          <td><strong>${esc(r.name || r.email.split('@')[0])}</strong><br><span class="fine">${esc(r.email)}${r.hasAccount ? '' : ' · no account yet'}${r.foundersRsvp ? ' · Founders RSVP' : ''}</span></td>
+          <td>${academyCell(r)}</td>
+          ${D.libraries.map((l) => `<td class="c"><label class="switch" title="${esc(l.name)}"><input type="checkbox" data-lib="${esc(l.id)}" data-email="${esc(r.email)}" ${r.libraries.includes(l.id) ? 'checked' : ''} /><span></span></label></td>`).join('')}
+          <td>${r.paid ? '' : `<button class="linkish" data-remove="${esc(r.email)}">Remove</button>`}</td>
+        </tr>`).join('') : `<tr><td colspan="${D.libraries.length + 3}" class="muted">Nobody matches.</td></tr>`;
+      const toggle = async (input, body, update) => {
+        input.disabled = true;
+        try { await api('/api/academy/admin', body); update(); }
+        catch (e) { input.checked = !input.checked; fail(e); }
+        finally { input.disabled = false; }
+      };
+      rows.querySelectorAll('[data-lib]').forEach((i) => (i.onchange = () => toggle(i, { action: 'setLibrary', email: i.dataset.email, library: i.dataset.lib, on: i.checked }, () => {
+        const r = D.roster.find((x) => x.email === i.dataset.email);
+        r.libraries = i.checked ? [...new Set([...r.libraries, i.dataset.lib])] : r.libraries.filter((x) => x !== i.dataset.lib);
+      })));
+      rows.querySelectorAll('[data-academy]').forEach((i) => (i.onchange = () => toggle(i, { action: 'setAcademy', email: i.dataset.academy, on: i.checked, until: D.alumniUntil }, () => {
+        const r = D.roster.find((x) => x.email === i.dataset.academy);
+        r.compUntil = i.checked ? D.alumniUntil : null; r.member = r.paid || i.checked; drawRows();
+      })));
+      rows.querySelectorAll('[data-remove]').forEach((b) => (b.onclick = () => confirm(`Take away all access for ${b.dataset.remove}?`) && busy(b, async () => {
+        try { await api('/api/academy/admin', { action: 'removePerson', email: b.dataset.remove }); await render(); } catch (e) { fail(e); }
+      })));
+    }
+
     async function render() {
       let d;
       try { d = await api('/api/academy/admin', { action: 'load' }); }
       catch (e) { app.innerHTML = ''; return fail(e.status === 403 ? new Error('This page is for Academy admins.') : e); }
+      D = d;
       const s = d.settings;
       const active = d.roster.filter((r) => r.member).length;
 
@@ -87,7 +130,7 @@
         <form class="card ac-form" id="upload">
           <p>Upload the call recording here. It goes straight to your private Cloudflare video library; only logged-in members can watch it.</p>
           <label>Video file <input type="file" name="file" accept="video/*" required /></label>
-          <label>Library <small>Who can watch it</small><select name="program"><option value="academy">Creator Academy members</option><option value="cc">Creator Consciousness alumni</option></select></label>
+          <label>Library <small>Who can watch it</small><select name="program">${libOptions('academy')}</select></label>
           <div class="row">
             <label>Title <input name="title" required placeholder="Weekly Call: Finding your voice" /></label>
             <label>Call date <input type="date" name="date" required value="${today()}" /></label>
@@ -98,38 +141,49 @@
           <p class="fine">Keep this tab open until it says Published. The video takes a few minutes to finish processing before it plays.</p>
         </form>
         ${d.replays.length ? `<div class="card"><div class="kicker">In the library</div><table class="ac-table"><tbody>
-          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}<br><span class="fine">${r.program === 'cc' ? 'Creator Consciousness' : 'Academy'}</span></td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
+          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}<br><select class="mini" data-movereplay="${esc(r.uid)}">${r.program === 'cc' ? '<option value="cc" selected>Not yet filed</option>' : ''}${libOptions(r.program || 'academy')}</select></td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
         </tbody></table></div>` : ''}
 
-        <h2>Included access</h2>
-        <form class="card ac-form" id="comp">
-          <p>Give someone free access until a date, like your current Creator Consciousness cohort. They just create an account with this email.</p>
-          <div class="row">
-            <label>Email <input type="email" name="email" required /></label>
-            <label>Access until <input type="date" name="until" required value="2026-12-25" /></label>
+        <h2 id="access">Who has access <span class="fine">${d.roster.length} people · ${active} in the Academy</span></h2>
+        <p class="fine">Switch a library on or off for anyone. Access follows the email, so people you add here see their libraries as soon as they create an account with that email. Nobody is emailed when you add them.</p>
+        <div class="card ac-access">
+          <div class="ac-access-bar">
+            <input type="search" id="q" placeholder="Search name or email" value="${esc(q)}" />
+            <select id="f">
+              <option value="">Everyone</option>
+              <option value="academy" ${f === 'academy' ? 'selected' : ''}>In the Academy</option>
+              <option value="paid" ${f === 'paid' ? 'selected' : ''}>Paying</option>
+              <option value="free" ${f === 'free' ? 'selected' : ''}>Free until a date</option>
+              <option value="noaccount" ${f === 'noaccount' ? 'selected' : ''}>No account yet</option>
+              ${d.libraries.map((l) => `<option value="${esc(l.id)}" ${f === l.id ? 'selected' : ''}>${esc(l.short)}</option>`).join('')}
+            </select>
           </div>
-          <label>Note <small>Optional, only you see it</small><input name="note" placeholder="Fall cohort" /></label>
+          <div style="overflow-x:auto"><table class="ac-table ac-roster">
+            <thead><tr><th>Person</th><th>Creator Academy</th>${d.libraries.map((l) => `<th class="c">${esc(l.short)}</th>`).join('')}<th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table></div>
+        </div>
+
+        <h2>Add a round of people</h2>
+        <form class="card ac-form" id="bulk">
+          <p>Paste the emails from a Creator Consciousness round. Each person gets that round's library. Nobody is emailed.</p>
+          <label>Library <select name="library">${d.libraries.map((l, i) => `<option value="${esc(l.id)}" ${i === d.libraries.length - 1 ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select></label>
+          <label>Emails <small>One per line, or separated by commas</small><textarea name="emails" style="min-height:110px"></textarea></label>
+          <label class="check"><input type="checkbox" name="withAcademy" checked /> Also give them Creator Academy free through ${esc(fmtDate(d.alumniUntil, { month: 'long', day: 'numeric', year: 'numeric' }))}</label>
           <button class="btn-primary" type="submit">Give access</button>
         </form>
-        ${d.comps.length ? `<div class="card"><table class="ac-table"><thead><tr><th>Email</th><th>Until</th><th>Note</th><th></th></tr></thead><tbody>
-          ${d.comps.map((c) => `<tr><td>${esc(c.email)}</td><td>${esc(fmtDate(c.until, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(c.note || '')}</td><td><button class="linkish" data-delcomp="${esc(c.email)}">Remove</button></td></tr>`).join('')}
-        </tbody></table></div>` : ''}
 
-        <h2>Creator Consciousness alumni</h2>
-        <form class="card ac-form" id="alumni">
-          <p>Alumni can log in and watch the Creator Consciousness library. Anyone who pays on the Creator Consciousness page is added automatically. Add past participants here (one email per line, or comma-separated).</p>
-          <label>Emails <textarea name="emails" style="min-height:90px"></textarea></label>
-          <label>Cohort <small>Optional</small><input name="cohort" placeholder="Fall 2026" /></label>
-          <button class="btn-primary" type="submit">Add alumni</button>
-        </form>
-        ${d.alumni.length ? `<div class="card" style="overflow-x:auto"><table class="ac-table"><thead><tr><th>Email</th><th>Cohort</th><th>Added by</th><th></th></tr></thead><tbody>
-          ${d.alumni.map((a) => `<tr><td>${esc(a.email)}</td><td>${esc(a.cohort || '')}</td><td>${a.source === 'stripe' ? 'Payment' : 'Camila'}</td><td><button class="linkish" data-delalumni="${esc(a.email)}">Remove</button></td></tr>`).join('')}
-        </tbody></table></div>` : ''}
-
-        <h2>Members <span class="fine">${active} with access · ${d.roster.length} accounts</span></h2>
-        <div class="card" style="overflow-x:auto">${d.roster.length ? `<table class="ac-table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Plan</th><th>Renews / ends</th><th>CC alum</th><th>Founders RSVP</th></tr></thead><tbody>
-          ${d.roster.sort((a, b) => Number(b.member) - Number(a.member)).map((r) => `<tr><td>${esc(r.name || '')}</td><td>${esc(r.email)}</td><td>${statusPill(r)}${r.cancelAtPeriodEnd ? ' <span class="fine">canceling</span>' : ''}</td><td>${esc(r.plan || '')}</td><td>${r.periodEnd ? esc(fmtDate(r.periodEnd, { month: 'short', day: 'numeric' })) : ''}</td><td>${r.cc ? '✦' : ''}</td><td>${r.foundersRsvp ? '✦' : ''}</td></tr>`).join('')}
-        </tbody></table>` : '<p class="muted">No accounts yet.</p>'}</div>
+        <h2>Libraries</h2>
+        <div class="card">
+          <p>${d.libraries.map((l) => esc(l.name)).join(' · ')}</p>
+          <form class="ac-form" id="newlib" style="margin-top:.8rem">
+            <div class="row">
+              <label>New library <input name="name" placeholder="Creator Consciousness 5.0" required /></label>
+              <label>Short name <small>Shown on the roster and the Leads board</small><input name="short" placeholder="CC 5.0" /></label>
+            </div>
+            <button class="btn-outline" type="submit">Add library</button>
+          </form>
+        </div>
       </div>`;
 
       const form = (id, fn) => (document.getElementById(id).onsubmit = (ev) => { ev.preventDefault(); busy(ev.submitter, () => fn(new FormData(ev.target), ev.target)); });
@@ -144,11 +198,17 @@
       form('post', async (f) => {
         try { await api('/api/academy/admin', { action: 'addPost', ...Object.fromEntries(f) }); ok('Published to members.'); await render(); } catch (e) { fail(e); }
       });
-      form('comp', async (f) => {
-        try { await api('/api/academy/admin', { action: 'grantComp', ...Object.fromEntries(f) }); ok(`Access given to ${f.get('email')}.`); await render(); } catch (e) { fail(e); }
+      drawRows();
+      document.getElementById('q').oninput = (e) => { q = e.target.value; drawRows(); };
+      document.getElementById('f').onchange = (e) => { f = e.target.value; drawRows(); };
+      form('bulk', async (fd, el) => {
+        try {
+          const r = await api('/api/academy/admin', { action: 'bulkAccess', library: fd.get('library'), emails: fd.get('emails'), withAcademy: fd.get('withAcademy') === 'on' });
+          ok(`${r.added} ${r.added === 1 ? 'person has' : 'people have'} access.`); el.reset(); await render();
+        } catch (e) { fail(e); }
       });
-      form('alumni', async (f) => {
-        try { const r = await api('/api/academy/admin', { action: 'addAlumni', emails: f.get('emails'), cohort: f.get('cohort') }); ok(`Added ${r.added} alumni.`); await render(); } catch (e) { fail(e); }
+      form('newlib', async (fd) => {
+        try { await api('/api/academy/admin', { action: 'addLibrary', name: fd.get('name'), short: fd.get('short') }); ok('Library added.'); await render(); } catch (e) { fail(e); }
       });
       form('upload', async (f) => {
         const file = f.get('file');
@@ -174,8 +234,9 @@
       });
       app.querySelectorAll('[data-delpost]').forEach((b) => (b.onclick = () => confirm('Delete this post and its replies?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'deletePost', id: b.dataset.delpost }); await render(); } catch (e) { fail(e); } })));
       app.querySelectorAll('[data-delreplay]').forEach((b) => (b.onclick = () => confirm('Remove this replay from the library? (The video stays in Cloudflare.)') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeReplay', uid: b.dataset.delreplay }); await render(); } catch (e) { fail(e); } })));
-      app.querySelectorAll('[data-delalumni]').forEach((b) => (b.onclick = () => confirm('Remove this person from the alumni library?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeAlumni', email: b.dataset.delalumni }); await render(); } catch (e) { fail(e); } })));
-      app.querySelectorAll('[data-delcomp]').forEach((b) => (b.onclick = () => confirm('Remove included access for this email?') && busy(b, async () => { try { await api('/api/academy/admin', { action: 'removeComp', email: b.dataset.delcomp }); await render(); } catch (e) { fail(e); } })));
+      app.querySelectorAll('[data-movereplay]').forEach((sel) => (sel.onchange = async () => {
+        try { await api('/api/academy/admin', { action: 'moveReplay', uid: sel.dataset.movereplay, program: sel.value }); ok('Moved.'); } catch (e) { fail(e); }
+      }));
     }
     await render();
 

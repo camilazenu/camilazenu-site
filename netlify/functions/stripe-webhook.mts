@@ -2,7 +2,7 @@
 // Grants or removes Creator Academy access and closes the Creator Consciousness 2-pay plan after payment 2.
 import type { Context } from "@netlify/functions"
 import type Stripe from "stripe"
-import { accessFor, addAlumni, getRecordById, saveRecord, stripe, syncRole, userIdForCustomer, type MemberRecord } from "../lib/academy.mts"
+import { accessFor, getLibraries, getRecordById, notifyAccess, saveRecord, setLibraryAccess, stripe, syncRole, userIdForCustomer, type MemberRecord } from "../lib/academy.mts"
 
 export default async (req: Request, context: Context) => {
   const secret = Netlify.env.get("STRIPE_WEBHOOK_SECRET")?.trim()
@@ -26,7 +26,13 @@ export default async (req: Request, context: Context) => {
         if (session.metadata?.offer === "creator-consciousness") {
           // Enrolling unlocks the CC video library for the email they paid with.
           const email = session.customer_details?.email ?? session.customer_email
-          if (email) await addAlumni(context, { email, source: "stripe", cohort: session.metadata?.cohort })
+          if (email) {
+            // New Creator Consciousness enrollments join the newest round's library.
+            const libs = await getLibraries(context)
+            const lib = session.metadata?.library || libs[libs.length - 1]?.id
+            if (lib) await setLibraryAccess(context, email, lib, true, "stripe")
+            await notifyAccess(context, email, "cc-enrolled")
+          }
         }
         if (session.metadata?.offer === "creator-consciousness" && session.metadata?.plan === "installment" && subId) {
           await endAfterTwoPayments(s, subId)
@@ -84,6 +90,7 @@ async function applySubscription(context: Context, sub: Stripe.Subscription, use
   await saveRecord(context, rec)
   const { member } = await accessFor(context, rec)
   await syncRole(userId, member)
+  await notifyAccess(context, rec.email, `subscription-${rec.status}`)
 }
 
 /** The $500 × 2 plan: cancel right after the second charge, with no proration. */
