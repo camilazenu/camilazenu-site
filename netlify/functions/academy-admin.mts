@@ -169,6 +169,46 @@ export default async (req: Request, context: Context) => {
       return json({ uploadUrl: location, uid })
     }
 
+    case "importDrive": {
+      // Cloudflare fetches the file straight from Google Drive: nothing passes through the browser.
+      // The Drive file must be shared "Anyone with the link" until the import finishes downloading.
+      const m = str(b.link, 500).match(/(?:\/d\/|[?&]id=)([A-Za-z0-9_-]{20,})/)
+      if (!m) return fail("Paste a Google Drive file link.", 400)
+      const title = str(b.title, 200), date = str(b.date, 10), program = str(b.program, 40) || "academy"
+      if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return fail("Add a title and a date.", 400)
+      if (program !== "academy" && !(await getLibraries(context)).some((l) => l.id === program)) return fail("Pick a library.", 400)
+      const cf = cloudflare()
+      const res = await fetch(`${cf.base}/copy`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${cf.token}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          url: `https://drive.usercontent.google.com/download?id=${m[1]}&export=download&confirm=t`,
+          meta: { name: title },
+          requireSignedURLs: true,
+        }),
+      })
+      const out = (await res.json().catch(() => ({}))) as { success?: boolean; result?: { uid?: string }; errors?: { message?: string }[] }
+      const uid = out.result?.uid
+      if (!res.ok || !out.success || !uid) return fail(`Cloudflare couldn't start the import: ${out.errors?.[0]?.message ?? res.status}`, 502)
+      const replays = (await getReplays(context)).filter((r) => r.uid !== uid)
+      replays.push({ uid, title, date, note: str(b.note, 1000), program })
+      await saveReplays(context, replays)
+      return json({ ok: true, uid })
+    }
+
+    case "videoStatus": {
+      // Processing state for replays: downloading → queued → inprogress → ready (or error).
+      const cf = cloudflare()
+      const uids = (Array.isArray(b.uids) ? b.uids : []).map((u: unknown) => str(u, 64)).filter((u: string) => /^[a-f0-9]{32}$/i.test(u)).slice(0, 50)
+      const states = await Promise.all(uids.map(async (uid: string) => {
+        const r = await fetch(`${cf.base}/${uid}`, { headers: { Authorization: `Bearer ${cf.token}` } })
+        const v = (await r.json().catch(() => ({}))) as { result?: { status?: { state?: string; pctComplete?: string; errorReasonText?: string }; duration?: number; requireSignedURLs?: boolean } }
+        const st = v.result?.status
+        return { uid, state: st?.state ?? (r.status === 404 ? "missing" : "unknown"), pct: st?.pctComplete ?? null, error: st?.errorReasonText ?? null, duration: v.result?.duration ?? null, signed: v.result?.requireSignedURLs ?? null }
+      }))
+      return json({ states })
+    }
+
     case "addReplay": {
       const uid = str(b.uid, 64), title = str(b.title, 200), date = str(b.date, 10)
       if (!/^[a-f0-9]{32}$/i.test(uid)) return fail("That video ID doesn't look right.", 400)

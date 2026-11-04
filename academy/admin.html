@@ -146,8 +146,19 @@
           <button class="btn-primary" type="submit">Upload &amp; publish</button>
           <p class="fine">Keep this tab open until it says Published. The video takes a few minutes to finish processing before it plays.</p>
         </form>
+        <form class="card ac-form" id="drive">
+          <div class="kicker">Or import from Google Drive</div>
+          <p>Faster for big files: Cloudflare pulls the video straight from Drive. In Drive, set the file to <strong>Anyone with the link</strong>, paste its link here, and switch sharing back to Restricted once the status below says it's processing.</p>
+          <label>Google Drive link <input name="link" required placeholder="https://drive.google.com/file/d/…/view" /></label>
+          <label>Library <select name="program">${libOptions('academy')}</select></label>
+          <div class="row">
+            <label>Title <input name="title" required /></label>
+            <label>Call date <input type="date" name="date" required value="${today()}" /></label>
+          </div>
+          <button class="btn-primary" type="submit">Import</button>
+        </form>
         ${d.replays.length ? `<div class="card"><div class="kicker">In the library</div><table class="ac-table"><tbody>
-          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}<br><select class="mini" data-movereplay="${esc(r.uid)}">${r.program === 'cc' ? '<option value="cc" selected>Not yet filed</option>' : ''}${libOptions(r.program || 'academy')}</select></td><td><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
+          ${[...d.replays].sort((a, b) => b.date.localeCompare(a.date)).map((r) => `<tr><td>${esc(fmtDate(r.date, { month: 'short', day: 'numeric', year: 'numeric' }))}</td><td>${esc(r.title)}<br><select class="mini" data-movereplay="${esc(r.uid)}">${r.program === 'cc' ? '<option value="cc" selected>Not yet filed</option>' : ''}${libOptions(r.program || 'academy')}</select></td><td><span class="fine" data-vstate="${esc(r.uid)}"></span><br><button class="linkish" data-delreplay="${esc(r.uid)}">Unpublish</button></td></tr>`).join('')}
         </tbody></table></div>` : ''}
 
         <h2 id="access">Who has access <span class="fine">${d.roster.length} people · ${active} in the Academy</span></h2>
@@ -213,6 +224,25 @@
           ok(`${r.added} ${r.added === 1 ? 'person has' : 'people have'} access.`); el.reset(); await render();
         } catch (e) { fail(e); }
       });
+      form('drive', async (fd, el) => {
+        try {
+          await api('/api/academy/admin', { action: 'importDrive', link: fd.get('link'), title: fd.get('title'), date: fd.get('date'), program: fd.get('program') });
+          ok('Import started. Cloudflare is pulling the video from Drive; watch its status in the library list.'); el.reset(); await render();
+        } catch (e) { fail(e); }
+      });
+      // Processing status for each replay
+      (async () => {
+        const uids = D.replays.map((r) => r.uid);
+        if (!uids.length) return;
+        try {
+          const { states } = await api('/api/academy/admin', { action: 'videoStatus', uids });
+          const label = { ready: 'Ready', downloading: 'Downloading from Drive…', queued: 'Queued', inprogress: 'Processing…', pendingupload: 'Waiting for upload', error: 'Failed', missing: 'Not in Cloudflare' };
+          states.forEach((s) => {
+            const el = app.querySelector(`[data-vstate="${s.uid}"]`);
+            if (el) el.textContent = (label[s.state] || s.state) + (s.pct && s.state !== 'ready' ? ` ${Math.round(Number(s.pct))}%` : '') + (s.error ? ` · ${s.error}` : '');
+          });
+        } catch {}
+      })();
       form('newlib', async (fd) => {
         try { await api('/api/academy/admin', { action: 'addLibrary', name: fd.get('name'), short: fd.get('short') }); ok('Library added.'); await render(); } catch (e) { fail(e); }
       });
