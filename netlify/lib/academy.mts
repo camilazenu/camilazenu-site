@@ -71,6 +71,7 @@ export async function saveRecord(context: Context, rec: MemberRecord) {
   rec.updatedAt = Date.now()
   await store(context).setJSON(userKey(rec.userId), rec)
   if (rec.customerId) await store(context).set(customerKey(rec.customerId), rec.userId)
+  if (rec.email) await store(context).set(`emails/${rec.email.trim().toLowerCase()}`, rec.userId)
 }
 
 export async function userIdForCustomer(context: Context, customerId: string) {
@@ -94,9 +95,12 @@ export async function removeComp(context: Context, email: string) {
   await store(context).delete(compKey(email))
 }
 
+/** Library access for one email (works before the person creates an account).
+ *  Stored under ccalumni/{email} for continuity with the first version. */
 export interface Alumni {
   email: string
-  cohort?: string
+  libraries?: string[] // library ids, e.g. ["cc2"]
+  cohort?: string // first version only
   addedAt: number
   source: "stripe" | "admin"
 }
@@ -106,11 +110,21 @@ export async function getAlumni(context: Context, email?: string) {
   return (await store(context).get(alumniKey(email), { type: "json" })) as Alumni | null
 }
 
-export async function addAlumni(context: Context, a: Omit<Alumni, "addedAt"> & { addedAt?: number }) {
-  const existing = await getAlumni(context, a.email)
-  await store(context).setJSON(alumniKey(a.email), {
-    ...existing, ...a, email: a.email.trim().toLowerCase(), addedAt: existing?.addedAt ?? a.addedAt ?? Date.now(),
-  })
+/** Turn one library on or off for an email. Returns the person's libraries afterwards. */
+export async function setLibraryAccess(context: Context, email: string, library: string, on: boolean, source: Alumni["source"] = "admin") {
+  const e = email.trim().toLowerCase()
+  const existing = await getAlumni(context, e)
+  const libs = new Set(existing?.libraries ?? [])
+  if (on) libs.add(library)
+  else libs.delete(library)
+  if (!libs.size && !on) {
+    await store(context).delete(alumniKey(e))
+    return []
+  }
+  await store(context).setJSON(alumniKey(e), {
+    email: e, libraries: [...libs], addedAt: existing?.addedAt ?? Date.now(), source: existing?.source ?? source,
+  } satisfies Alumni)
+  return [...libs]
 }
 
 export async function removeAlumni(context: Context, email: string) {
@@ -120,18 +134,77 @@ export async function removeAlumni(context: Context, email: string) {
 const compActive = (comp: Comp | null) =>
   !!comp && Date.parse(`${comp.until}T23:59:59-08:00`) >= Date.now()
 
-/** Two gates:
- *  member — Creator Academy (paid, or complimentary until a date). Past-due and canceled lose it.
- *  cc     — Creator Consciousness alumni: unlocks the CC video library, for good. */
-export async function accessFor(context: Context, rec: MemberRecord) {
+/** Gates:
+ *  member    — Creator Academy (paid, or complimentary until a date). Past-due and canceled lose it.
+ *  libraries — the Creator Consciousness rounds this email was part of (CC 1.0, 2.0 …), each its own library. */
+export async function accessFor(context: Context, rec: Pick<MemberRecord, "email" | "status">) {
   const paid = rec.status === "active" || rec.status === "trialing"
   const [comp, alumni] = await Promise.all([getComp(context, rec.email), getAlumni(context, rec.email)])
-  return { member: paid || compActive(comp), paid, comp: compActive(comp) ? comp : null, cc: !!alumni }
+  const libraries = alumni?.libraries ?? []
+  return { member: paid || compActive(comp), paid, comp: compActive(comp) ? comp : null, libraries, cc: libraries.length > 0 }
 }
 
 /** Which libraries a user may watch. Admins see everything. */
-export const canWatch = (program: Program, a: { member: boolean; cc: boolean }, admin: boolean) =>
-  admin || (program === "cc" ? a.cc : a.member)
+export const canWatch = (program: Program, a: { member: boolean; libraries: string[] }, admin: boolean) =>
+  admin || (program === "academy" ? a.member : a.libraries.includes(program))
+
+/** Who can read (and reply to) a prompt, resource or update. */
+export const canSeePost = (post: { audience?: string }, a: { member: boolean; libraries: string[] }, admin: boolean) => {
+  const aud = post.audience ?? "academy"
+  return admin || (aud === "academy" ? a.member : aud === "cc" ? a.libraries.length > 0 : a.libraries.includes(aud))
+}
+
+// ── Libraries ────────────────────────────────────────────────────
+
+export interface Library {
+  id: string
+  name: string // "Creator Consciousness 2.0"
+  short: string // "CC 2.0", also the label on the Leads board
+}
+
+export const DEFAULT_LIBRARIES: Library[] = ["1.0", "2.0", "3.0", "4.0"].map((v, i) => ({
+  id: `cc${i + 1}`, name: `Creator Consciousness ${v}`, short: `CC ${v}`,
+}))
+
+export const getLibraries = async (context: Context) =>
+  ((await store(context).get("content/libraries", { type: "json" })) as Library[] | null) ?? DEFAULT_LIBRARIES
+export const saveLibraries = (context: Context, l: Library[]) => store(context).setJSON("content/libraries", l)
+
+/** Free Creator Academy for past Creator Consciousness participants, through the end of 2026. */
+export const ALUMNI_ACADEMY_UNTIL = "2026-12-31"
+
+// ── Leads board sync (Monday, via Zapier) ────────────────────────
+
+/** Tells the Leads board what this email can access now. Production only, so test data never reaches Monday. */
+export async function notifyAccess(context: Context, email: string, event: string, name?: string) {
+  const hook = Netlify.env.get("ZAPIER_ACCESS_HOOK")
+  if (!hook || !isProduction(context) || !email) return
+  try {
+    const e = email.trim().toLowerCase()
+    const userId = await store(context).get(`emails/${e}`, { type: "text" })
+    const rec = userId ? await getRecordById(context, userId) : null
+    const access = await accessFor(context, { email: e, status: rec?.status })
+    const libs = await getLibraries(context)
+    const academy = access.paid ? "Paid"
+      : access.comp ? "Free trial"
+      : rec?.status === "past_due" ? "Past due"
+      : rec?.status === "canceled" ? "Canceled"
+      : rec ? "Account only" : "Invited"
+    await fetch(hook, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: e, name: name ?? rec?.name ?? "", event, academy,
+        plan: access.paid ? rec?.plan ?? "" : "",
+        academyUntil: access.paid ? (rec?.periodEnd ? new Date(rec.periodEnd * 1000).toISOString().slice(0, 10) : "") : access.comp?.until ?? "",
+        rounds: libs.filter((l) => access.libraries.includes(l.id)).map((l) => l.short),
+        hasAccount: !!rec,
+      }),
+    })
+  } catch (err) {
+    console.error("notifyAccess failed", email, err)
+  }
+}
 
 // ── Auth ─────────────────────────────────────────────────────────
 
@@ -179,7 +252,7 @@ export interface Settings {
   welcome?: string
 }
 
-export type Program = "academy" | "cc"
+export type Program = string // "academy", or a library id such as "cc2" ("cc" = uploaded before libraries were split)
 
 export interface Replay {
   uid: string
@@ -200,6 +273,7 @@ export interface Comment {
 export interface Post {
   id: string
   kind: "prompt" | "post" | "resource"
+  audience?: string // "academy" (missing = academy), "cc" = every Creator Consciousness round, or one library id ("cc2")
   title: string
   body: string
   createdAt: number
