@@ -14,7 +14,7 @@
     { label: 'Events', href: '/events' },
     { label: 'Creator Consciousness', href: '/creator-consciousness' },
     { label: 'Creator Academy', href: '/creator-academy', tag: 'New' },
-    { label: 'She’s Cultured', href: 'https://shescultured.com', external: true, tag: 'Podcast', note: 'New episodes every Thursday · with Tiffany Kerr' },
+    { label: 'She’s Cultured', href: 'https://www.youtube.com/@ShesCulturedPodcast', external: true, tag: 'Podcast', note: 'New episodes every Thursday · with Tiffany Kerr' },
     { label: 'Substack', href: 'https://sanctuaryofthewild.substack.com/', external: true, note: 'Writing from the in between' },
     {
       label: 'Offerings', children: [
